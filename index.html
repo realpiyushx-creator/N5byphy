@@ -1,439 +1,743 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nihongo Pro | Ultimate Edition</title>
+/* --- CHUNK 1: KANJI STYLES --- */
+/* Add this to your styles.css */
+
+#kanji-section {
+    padding: 4rem 2rem;
+    background-color: #f8f9fa;
+}
+
+.kanji-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.kanji-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 2px solid transparent;
+}
+
+.kanji-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+    border-color: #ff4757;
+}
+
+.kanji-char {
+    font-size: 4rem;
+    font-weight: bold;
+    color: #2d3436;
+    margin-bottom: 0.5rem;
+    font-family: 'Noto Sans JP', sans-serif;
+}
+
+.kanji-meaning {
+    font-size: 1.1rem;
+    color: #636e72;
+    font-weight: 500;
+}
+
+/* Modal for Memory Tricks */
+.kanji-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+}
+
+.kanji-modal {
+    background: white;
+    width: 90%;
+    max-width: 600px;
+    border-radius: 20px;
+    padding: 2rem;
+    position: relative;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from { transform: translateY(50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.close-modal {
+    position: absolute;
+    top: 1rem;
+    right: 1.5rem;
+    font-size: 2rem;
+    cursor: pointer;
+    color: #aaa;
+}
+
+.memory-trick-box {
+    background: #fff3cd;
+    border-left: 5px solid #ffc107;
+    padding: 1rem;
+    margin: 1.5rem 0;
+    border-radius: 4px;
+    font-style: italic;
+    color: #5d4037;
+}
+
+.readings-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 1rem;
+    text-align: left;
+}
+
+.reading-type {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    color: #b2bec3;
+    margin-bottom: 0.2rem;
+    letter-spacing: 1px;
+}
+<section id="kanji-section">
+    <div class="section-header">
+        <h2>N5 Kanji Challenge</h2>
+        <p>Unlock the power of <span class="highlight">Memory Tricks</span>. Click a card to reveal the story behind the character.</p>
+    </div>
+
+    <div class="kanji-controls" style="margin-bottom: 20px; display: flex; gap: 10px;">
+        <input type="text" id="kanjiSearch" placeholder="Search meaning (e.g., 'Tree', 'Sun')..." 
+               style="padding: 10px; border-radius: 8px; border: 1px solid #ddd; width: 100%; max-width: 300px;">
+    </div>
+
+    <div class="kanji-grid" id="kanjiGrid">
+        </div>
+</section>
+
+<div class="kanji-modal-overlay" id="kanjiModalOverlay">
+    <div class="kanji-modal">
+        <span class="close-modal" onclick="closeKanjiModal()">&times;</span>
+        
+        <div style="text-align: center; margin-bottom: 1rem;">
+            <div id="modalKanjiChar" style="font-size: 6rem; color: #2d3436;"></div>
+            <h3 id="modalKanjiMeaning" style="font-size: 2rem; color: #ff4757; margin: 0;"></h3>
+        </div>
+
+        <div class="memory-trick-box">
+            <strong>🧠 Memory Trick:</strong>
+            <p id="modalMemoryTrick"></p>
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 1.5rem 0;">
+
+        <div class="readings-grid">
+            <div>
+                <div class="reading-type">Onyomi (Sound)</div>
+                <div id="modalOnyomi" style="font-weight: bold; font-size: 1.2rem;"></div>
+            </div>
+            <div>
+                <div class="reading-type">Kunyomi (Meaning)</div>
+                <div id="modalKunyomi" style="font-weight: bold; font-size: 1.2rem;"></div>
+            </div>
+        </div>
+        
+        <div style="margin-top: 1.5rem; text-align: left;">
+            <div class="reading-type">Common Compounds</div>
+            <ul id="modalCompounds" style="list-style: none; padding: 0; margin-top: 0.5rem;">
+                </ul>
+        </div>
+    </div>
+</div>
+/* --- CHUNK 3: KANJI DATA SET 1 --- */
+/* Add to script.js */
+
+const n5KanjiList = [
+    {
+        char: "日",
+        meaning: "Day / Sun",
+        onyomi: "NICHI, JITSU (ニチ, ジツ)",
+        kunyomi: "hi, -bi (ひ, -び)",
+        trick: "It is a picture of the **sun**. The rectangle is the shape, and the line in the middle is the sunspot or the heat radiating.",
+        compounds: [
+            "日本 (Nihon) - Japan",
+            "日曜日 (Nichiyoubi) - Sunday",
+            "毎日 (Mainichi) - Every day"
+        ]
+    },
+    {
+        char: "月",
+        meaning: "Month / Moon",
+        onyomi: "GETSU, GATSU (ゲツ, ガツ)",
+        kunyomi: "tsuki (つき)",
+        trick: "It looks like a **crescent moon** with two clouds floating in front of it.",
+        compounds: [
+            "月曜日 (Getsuyoubi) - Monday",
+            "一月 (Ichigatsu) - January",
+            "今月 (Kongetsu) - This month"
+        ]
+    },
+    {
+        char: "木",
+        meaning: "Tree",
+        onyomi: "MOKU, BOKU (モク, ボク)",
+        kunyomi: "ki (き)",
+        trick: "It looks exactly like a **tree**. The vertical line is the trunk, the horizontal line is the branches, and the bottom strokes are the roots.",
+        compounds: [
+            "木曜日 (Mokuyoubi) - Thursday",
+            "木 (Ki) - Tree",
+            "大木 (Taiboku) - Large tree"
+        ]
+    },
+    {
+        char: "山",
+        meaning: "Mountain",
+        onyomi: "SAN (サン)",
+        kunyomi: "yama (やま)",
+        trick: "A pictogram of a **mountain** with three peaks. The middle peak is the highest.",
+        compounds: [
+            "富士山 (Fujisan) - Mt. Fuji",
+            "山 (Yama) - Mountain",
+            "火山 (Kazan) - Volcano"
+        ]
+    },
+    {
+        char: "川",
+        meaning: "River",
+        onyomi: "SEN (セン)",
+        kunyomi: "kawa (かわ)",
+        trick: "Three lines flowing vertically, just like the water of a flowing **river**.",
+        compounds: [
+            "川 (Kawa) - River",
+            "小川 (Ogawa) - Stream/Brook",
+            "川上 (Kawakami) - Upstream"
+        ]
+    },
+    {
+        char: "田",
+        meaning: "Rice Field",
+        onyomi: "DEN (デン)",
+        kunyomi: "ta (た)",
+        trick: "A bird's eye view of a **rice paddy** divided into four sections by irrigation channels.",
+        compounds: [
+            "水田 (Suiden) - Paddy field",
+            "田中 (Tanaka) - (Common Surname)",
+            "田んぼ (Tanbo) - Rice field"
+        ]
+    }
+];
+// End of Chunk 3
+/* --- CHUNK 4: KANJI DATA SET 2 --- */
+/* Append to n5KanjiList using array push or just continue the array above */
+
+const n5KanjiListPart2 = [
+    {
+        char: "人",
+        meaning: "Person",
+        onyomi: "JIN, NIN (ジン, ニン)",
+        kunyomi: "hito (ひと)",
+        trick: "A side view of a **person** walking. The legs are striding forward.",
+        compounds: [
+            "日本人 (Nihonjin) - Japanese person",
+            "三人 (Sannin) - Three people",
+            "大人 (Otona) - Adult"
+        ]
+    },
+    {
+        char: "口",
+        meaning: "Mouth",
+        onyomi: "KOU, KU (コウ, ク)",
+        kunyomi: "kuchi (くち)",
+        trick: "A wide open **mouth**. It's just a square opening.",
+        compounds: [
+            "人口 (Jinkou) - Population",
+            "入口 (Iriguchi) - Entrance",
+            "出口 (Deguchi) - Exit"
+        ]
+    },
+    {
+        char: "車",
+        meaning: "Car / Vehicle",
+        onyomi: "SHA (シャ)",
+        kunyomi: "kuruma (くるま)",
+        trick: "A bird's eye view of a cart or **car**. You can see the two wheels (top and bottom lines) and the axle going through the middle.",
+        compounds: [
+            "電車 (Densha) - Train",
+            "自動車 (Jidousha) - Automobile",
+            "車 (Kuruma) - Car"
+        ]
+    },
+    {
+        char: "門",
+        meaning: "Gate",
+        onyomi: "MON (モン)",
+        kunyomi: "kado (かど)",
+        trick: "It looks like a pair of swinging saloon **gates**.",
+        compounds: [
+            "専門 (Senmon) - Major/Specialty",
+            "門 (Mon) - Gate",
+            "名門 (Meimon) - Distinguished family"
+        ]
+    },
+    {
+        char: "火",
+        meaning: "Fire",
+        onyomi: "KA (カ)",
+        kunyomi: "hi, bi (ひ, び)",
+        trick: "A person (人) waving their arms in panic because they are on **fire** (points on sides).",
+        compounds: [
+            "火曜日 (Kayoubi) - Tuesday",
+            "花火 (Hanabi) - Fireworks",
+            "火事 (Kaji) - Fire (accident)"
+        ]
+    },
+    {
+        char: "水",
+        meaning: "Water",
+        onyomi: "SUI (スイ)",
+        kunyomi: "mizu (みず)",
+        trick: "Water splashing out of a central stream. Imagine a fountain splashing **water** left and right.",
+        compounds: [
+            "水曜日 (Suiyoubi) - Wednesday",
+            "水 (Mizu) - Water",
+            "水着 (Mizugi) - Swimsuit"
+        ]
+    }
+];
+
+// Combine arrays
+const fullKanjiList = [...n5KanjiList, ...n5KanjiListPart2];
+/* --- CHUNK 5: JS LOGIC (RENDER) --- */
+
+const kanjiGrid = document.getElementById('kanjiGrid');
+const searchInput = document.getElementById('kanjiSearch');
+
+function renderKanji(data) {
+    kanjiGrid.innerHTML = ''; // Clear current grid
+
+    data.forEach((k, index) => {
+        const card = document.createElement('div');
+        card.className = 'kanji-card';
+        card.onclick = () => openKanjiModal(k); // We will define this next
+
+        // Card Content
+        card.innerHTML = `
+            <div class="kanji-char">${k.char}</div>
+            <div class="kanji-meaning">${k.meaning}</div>
+        `;
+
+        kanjiGrid.appendChild(card);
+    });
+}
+
+// Initial Render
+renderKanji(fullKanjiList);
+
+// Search Functionality
+searchInput.addEventListener('input', (e) => {
+    const term = e.target.value.toLowerCase();
     
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;600;700&family=Zen+Maru+Gothic:wght@400;700&display=swap" rel="stylesheet">
+    const filtered = fullKanjiList.filter(k => 
+        k.meaning.toLowerCase().includes(term) || 
+        k.kunyomi.toLowerCase().includes(term)
+    );
+    
+    renderKanji(filtered);
+});
+/* --- CHUNK 6: JS LOGIC (MODAL) --- */
 
-    <style>
-        body { font-family: 'Quicksand', sans-serif; overflow: hidden; background: #f8fafc; }
-        .jp { font-family: 'Zen Maru Gothic', sans-serif; }
+const modalOverlay = document.getElementById('kanjiModalOverlay');
+
+function openKanjiModal(kanjiData) {
+    // Populate Modal Elements
+    document.getElementById('modalKanjiChar').innerText = kanjiData.char;
+    document.getElementById('modalKanjiMeaning').innerText = kanjiData.meaning;
+    
+    // Inject Memory Trick (supports HTML like <b> or <strong>)
+    document.getElementById('modalMemoryTrick').innerHTML = kanjiData.trick;
+    
+    document.getElementById('modalOnyomi').innerText = kanjiData.onyomi;
+    document.getElementById('modalKunyomi').innerText = kanjiData.kunyomi;
+
+    // Populate Compounds List
+    const compoundsList = document.getElementById('modalCompounds');
+    compoundsList.innerHTML = ''; // Clear previous
+    kanjiData.compounds.forEach(comp => {
+        const li = document.createElement('li');
+        li.style.padding = "4px 0";
+        li.style.borderBottom = "1px dashed #eee";
+        li.innerText = comp;
+        compoundsList.appendChild(li);
+    });
+
+    // Show Modal
+    modalOverlay.style.display = 'flex';
+}
+
+function closeKanjiModal() {
+    modalOverlay.style.display = 'none';
+}
+
+// Close if clicking outside the modal card
+modalOverlay.addEventListener('click', (e) => {
+    if (e.target === modalOverlay) {
+        closeKanjiModal();
+    }
+});
+
+// Close on Escape key
+document.addEventListener('keydown', (e) => {
+    if (e.key === "Escape" && modalOverlay.style.display === 'flex') {
+        closeKanjiModal();
+    }
+});
+/* --- CHUNK 7: NUMBERS & COUNTING DATA --- */
+/* Copy this array and spread it into fullKanjiList */
+
+const kanjiNumbers = [
+    {
+        char: "一", meaning: "One",
+        onyomi: "ICHI, ITSU (イチ, イツ)", kunyomi: "hito (ひと)",
+        trick: "Just **one** finger holding up the number one.",
+        compounds: ["一日 (Tsuitachi) - 1st of month", "一つ (Hitotsu) - One thing"]
+    },
+    {
+        char: "二", meaning: "Two",
+        onyomi: "NI (ニ)", kunyomi: "futa (ふた)",
+        trick: "Two lines represent the number **two**.",
+        compounds: ["二月 (Nigatsu) - February", "二人 (Futari) - Two people"]
+    },
+    {
+        char: "三", meaning: "Three",
+        onyomi: "SAN (サン)", kunyomi: "mit (みっ)",
+        trick: "Three lines for the number **three**.",
+        compounds: ["三月 (Sangatsu) - March", "三日 (Mikka) - 3rd day"]
+    },
+    {
+        char: "四", meaning: "Four",
+        onyomi: "SHI (シ)", kunyomi: "yon, yo (よん, よ)",
+        trick: "It looks like a square window with curtains drawn. The corners make **four**.",
+        compounds: ["四月 (Shigatsu) - April", "四人 (Yonin) - Four people"]
+    },
+    {
+        char: "五", meaning: "Five",
+        onyomi: "GO (ゴ)", kunyomi: "itsu (いつ)",
+        trick: "Connect the dots of the number 5, and it looks a bit like this Kanji.",
+        compounds: ["五月 (Gogatsu) - May", "五円 (Goen) - 5 yen"]
+    },
+    {
+        char: "六", meaning: "Six",
+        onyomi: "ROKU (ロク)", kunyomi: "mut (むっ)",
+        trick: "A person doing jumping jacks with legs spread. **Six** reps!",
+        compounds: ["六月 (Rokugatsu) - June", "六つ (Muttsu) - Six things"]
+    },
+    {
+        char: "七", meaning: "Seven",
+        onyomi: "SHICHI (シチ)", kunyomi: "nana (なな)",
+        trick: "Imagine the number **7** turned upside down.",
+        compounds: ["七月 (Shichigatsu) - July", "七つ (Nanatsu) - Seven things"]
+    },
+    {
+        char: "八", meaning: "Eight",
+        onyomi: "HACHI (ハチ)", kunyomi: "yat (やっ)",
+        trick: "The shape of a volcano (Mt Fuji). In Japan, 8 is a lucky number because it widens at the bottom (prosperity).",
+        compounds: ["八月 (Hachigatsu) - August", "八百屋 (Yaoya) - Greengrocer"]
+    },
+    {
+        char: "九", meaning: "Nine",
+        onyomi: "KYUU, KU (キュウ, ク)", kunyomi: "kokono (ここの)",
+        trick: "It looks like a person doing a pushup, trying to do **nine** of them.",
+        compounds: ["九月 (Kugatsu) - September", "九つ (Kokonotsu) - Nine things"]
+    },
+    {
+        char: "十", meaning: "Ten",
+        onyomi: "JUU (ジュウ)", kunyomi: "tou (とう)",
+        trick: "A plus sign. Put two fives together (lines) to make **ten**.",
+        compounds: ["十月 (Juugatsu) - October", "十 (Tou) - Ten things"]
+    },
+    {
+        char: "百", meaning: "Hundred",
+        onyomi: "HYAKU (ヒャク)", kunyomi: "momo (もも)",
+        trick: "Take 'One' (一) and rotate 'White' (白) 90 degrees. One white standard represents a **hundred** soldiers.",
+        compounds: ["三百 (Sanbyaku) - 300", "百円 (Hyakuen) - 100 yen"]
+    },
+    {
+        char: "千", meaning: "Thousand",
+        onyomi: "SEN (セン)", kunyomi: "chi (ち)",
+        trick: "It combines 'One' (一) and 'Ten' (十) with a slash. 10 times 10 is... well, imagine it's a huge jump to a **thousand**.",
+        compounds: ["千円 (Senyen) - 1000 yen", "千葉 (Chiba) - Chiba Prefecture"]
+    },
+    {
+        char: "万", meaning: "Ten Thousand",
+        onyomi: "MAN (マン)", kunyomi: "—",
+        trick: "It looks like a variation of 'Five' (五) but simpler. It's a huge number, **10,000**.",
+        compounds: ["一万円 (Ichimanen) - 10,000 yen", "万国 (Bankoku) - All countries"]
+    },
+    {
+        char: "円", meaning: "Yen / Circle",
+        onyomi: "EN (エン)", kunyomi: "maru (まる)",
+        trick: "It looks like a teller window at a bank where you get **Yen**.",
+        compounds: ["百円 (Hyakuen) - 100 Yen", "円高 (Endaka) - Strong Yen"]
+    }
+];
+/* --- CHUNK 8: PEOPLE & SCHOOL DATA --- */
+
+const kanjiPeople = [
+    {
+        char: "父", meaning: "Father",
+        onyomi: "FU (フ)", kunyomi: "chichi (ちち)",
+        trick: "Two axes crossed above a face. The **father** provides/protects.",
+        compounds: ["お父さん (Otousan) - Father (polite)", "祖父 (Sofu) - Grandfather"]
+    },
+    {
+        char: "母", meaning: "Mother",
+        onyomi: "BO (ボ)", kunyomi: "haha (はは)",
+        trick: "The outline of a woman with two dots representing breasts. A nursing **mother**.",
+        compounds: ["お母さん (Okaasan) - Mother (polite)", "母国 (Bokoku) - Motherland"]
+    },
+    {
+        char: "友", meaning: "Friend",
+        onyomi: "YUU (ユウ)", kunyomi: "tomo (とも)",
+        trick: "Two hands holding each other. A symbol of **friendship**.",
+        compounds: ["友達 (Tomodachi) - Friend", "友人 (Yuujin) - Friend (formal)"]
+    },
+    {
+        char: "女", meaning: "Woman",
+        onyomi: "JO (ジョ)", kunyomi: "onna (おんな)",
+        trick: "A picture of a kneeling **woman**.",
+        compounds: ["女性 (Josei) - Female", "女の子 (Onnanoko) - Girl"]
+    },
+    {
+        char: "男", meaning: "Man",
+        onyomi: "DAN (ダン)", kunyomi: "otoko (おとこ)",
+        trick: "Rice Field (田) + Power (力). The **man** works in the rice field using power.",
+        compounds: ["男性 (Dansei) - Male", "男の子 (Otokonoko) - Boy"]
+    },
+    {
+        char: "子", meaning: "Child",
+        onyomi: "SHI (シ)", kunyomi: "ko (こ)",
+        trick: "A baby wrapped in a blanket with arms sticking out. A **child**.",
+        compounds: ["子供 (Kodomo) - Child", "女子 (Joshi) - Girl/Woman"]
+    },
+    {
+        char: "本", meaning: "Book / Origin",
+        onyomi: "HON (ホン)", kunyomi: "moto (もと)",
+        trick: "Tree (木) with a line at the base (roots). The root is the **origin**. Paper comes from trees = **Book**.",
+        compounds: ["本 (Hon) - Book", "日本 (Nihon) - Japan (Sun Origin)"]
+    },
+    {
+        char: "学", meaning: "Study / Learning",
+        onyomi: "GAKU (ガク)", kunyomi: "mana (まな)",
+        trick: "A child (子) under a school roof being taught by hands from above. Time to **study**.",
+        compounds: ["学生 (Gakusei) - Student", "学校 (Gakkou) - School"]
+    },
+    {
+        char: "校", meaning: "School",
+        onyomi: "KOU (コウ)", kunyomi: "—",
+        trick: "Tree (木) + 交 (Mingle/Mix). A place made of wood where people mingle = **School**.",
+        compounds: ["学校 (Gakkou) - School", "高校 (Koukou) - High School"]
+    },
+    {
+        char: "先", meaning: "Previous / Ahead",
+        onyomi: "SEN (セン)", kunyomi: "saki (さき)",
+        trick: "Human legs running ahead of the earth. Going **ahead**.",
+        compounds: ["先生 (Sensei) - Teacher", "先月 (Sengetsu) - Last month"]
+    },
+    {
+        char: "生", meaning: "Life / Birth",
+        onyomi: "SEI, SHOU (セイ, ショウ)", kunyomi: "i, u, na (い, う, な)",
+        trick: "A plant sprouting from the ground. New **life**.",
+        compounds: ["先生 (Sensei) - Teacher (born before)", "生きる (Ikiru) - To live"]
+    }
+];
+/* --- CHUNK 9: TIME & DIRECTION DATA --- */
+
+const kanjiTimeDir = [
+    {
+        char: "今", meaning: "Now",
+        onyomi: "KON (コン)", kunyomi: "ima (いま)",
+        trick: "A roof with a clock hand under it pointing down. The time is **now**.",
+        compounds: ["今日 (Kyou) - Today", "今月 (Kongetsu) - This month"]
+    },
+    {
+        char: "時", meaning: "Time / Hour",
+        onyomi: "JI (ジ)", kunyomi: "toki (とき)",
+        trick: "Sun (日) + Temple (寺). Before clocks, monks rang the temple bell at sunrise to mark **time**.",
+        compounds: ["時間 (Jikan) - Time", "一時 (Ichiji) - One o'clock"]
+    },
+    {
+        char: "分", meaning: "Minute / Part / Understand",
+        onyomi: "FUN, BUN (フン, ブン)", kunyomi: "wa (わ)",
+        trick: "Eight (八) + Knife (刀). Taking a knife and dividing something into **parts** or minutes.",
+        compounds: ["五分 (Gofun) - 5 minutes", "半分 (Hanbun) - Half"]
+    },
+    {
+        char: "半", meaning: "Half",
+        onyomi: "HAN (ハン)", kunyomi: "naka (なか)",
+        trick: "Three lines cut straight down the middle. Splitting it in **half**.",
+        compounds: ["二時半 (Nijihan) - 2:30", "半年 (Hantoshi) - Half a year"]
+    },
+    {
+        char: "午", meaning: "Noon",
+        onyomi: "GO (ゴ)", kunyomi: "—",
+        trick: "Looks like the number Ten (十) with a slanted roof. The sun is highest at **noon**.",
+        compounds: ["午前 (Gozen) - AM", "午後 (Gogo) - PM"]
+    },
+    {
+        char: "上", meaning: "Up / Above",
+        onyomi: "JOU (ジョウ)", kunyomi: "ue (うえ)",
+        trick: "A pointer pointing **up** above the ground line.",
+        compounds: ["上 (Ue) - Up", "上手 (Jouzu) - Skillful (Upper hand)"]
+    },
+    {
+        char: "下", meaning: "Down / Below",
+        onyomi: "KA, GE (カ, ゲ)", kunyomi: "shita (した)",
+        trick: "A pointer pointing **down** below the ground line.",
+        compounds: ["下 (Shita) - Down", "地下鉄 (Chikatetsu) - Subway"]
+    },
+    {
+        char: "中", meaning: "Middle / Inside",
+        onyomi: "CHUU (チュウ)", kunyomi: "naka (なか)",
+        trick: "A line going straight through the **middle** of a box.",
+        compounds: ["田中 (Tanaka) - Middle of field", "中国 (Chuugoku) - China"]
+    },
+    {
+        char: "北", meaning: "North",
+        onyomi: "HOKU (ホク)", kunyomi: "kita (きた)",
+        trick: "Two people sitting back to back because it's cold in the **North**.",
+        compounds: ["北海道 (Hokkaido) - Hokkaido", "北口 (Kitaguchi) - North exit"]
+    },
+    {
+        char: "南", meaning: "South",
+        onyomi: "NAN (ナン)", kunyomi: "minami (みなみ)",
+        trick: "A tropical plant growing inside a border. Warm **South**.",
+        compounds: ["南口 (Minamiguchi) - South exit", "南 (Minami) - South"]
+    },
+    {
+        char: "東", meaning: "East",
+        onyomi: "TOU (トウ)", kunyomi: "higashi (ひがし)",
+        trick: "Sun (日) rising behind a Tree (木). The sun rises in the **East**.",
+        compounds: ["東京 (Toukyou) - Tokyo", "東口 (Higashiguchi) - East exit"]
+    },
+    {
+        char: "西", meaning: "West",
+        onyomi: "SEI, SAI (セイ, サイ)", kunyomi: "nishi (にし)",
+        trick: "A bird returning to its nest at sunset. The sun sets in the **West**.",
+        compounds: ["関西 (Kansai) - Kansai region", "西口 (Nishiguchi) - West exit"]
+    }
+];
+/* --- CHUNK 10: MERGE & RENDER LOGIC --- */
+
+// Combine ALL data chunks into one Master List
+// Make sure this runs AFTER all the consts above are defined
+const n5MasterList = [
+    ...n5KanjiList,       // From previous turn
+    ...n5KanjiListPart2,  // From previous turn
+    ...kanjiNumbers,      // Chunk 7
+    ...kanjiPeople,       // Chunk 8
+    ...kanjiTimeDir       // Chunk 9
+];
+
+// Update the initial render to use the Master List
+// Replace the old render call with this:
+renderKanji(n5MasterList);
+
+// Update Search Logic to search the Master List
+const searchInputUpdated = document.getElementById('kanjiSearch');
+searchInputUpdated.addEventListener('input', (e) => {
+    const term = e.target.value.toLowerCase();
+    
+    // Search in Meaning, Reading, OR Character
+    const filtered = n5MasterList.filter(k => 
+        k.meaning.toLowerCase().includes(term) || 
+        k.kunyomi.toLowerCase().includes(term) ||
+        k.char.includes(term)
+    );
+    
+    renderKanji(filtered);
+});
+<button onclick="startKanjiQuiz()" style="padding: 10px 20px; background: #ff4757; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">
+    🔥 Start Quiz
+</button>
+
+<div id="quizOverlay" class="kanji-modal-overlay">
+    <div class="kanji-modal" style="text-align: center;">
+        <h3 style="color: #ccc;">What is this Kanji?</h3>
+        <div id="quizChar" style="font-size: 8rem; margin: 20px 0;"></div>
         
-        /* ANIMATIONS */
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-        .float-anim { animation: float 6s ease-in-out infinite; }
-        
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .slide-up { animation: slideUp 0.6s ease-out forwards; opacity: 0; }
-        
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .fade-in { animation: fadeIn 0.5s ease-out forwards; }
-
-        /* SAKURA BACKGROUND */
-        .sakura-container { 
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            pointer-events: none; z-index: 0; overflow: hidden;
-        }
-
-        /* 3D FLIP CARD STYLES (NEW) */
-        .perspective-1000 { perspective: 1000px; }
-        .transform-style-3d { transform-style: preserve-3d; }
-        .backface-hidden { backface-visibility: hidden; }
-        
-        .kanji-card-inner {
-            position: relative; width: 100%; height: 100%; text-align: center;
-            transition: transform 0.8s; transform-style: preserve-3d;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); border-radius: 1rem;
-        }
-        
-        .kanji-card:hover .kanji-card-inner { transform: rotateY(180deg); }
-        
-        .kanji-front, .kanji-back {
-            position: absolute; width: 100%; height: 100%;
-            -webkit-backface-visibility: hidden; backface-visibility: hidden;
-            border-radius: 1rem; display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-        }
-        
-        .kanji-back {
-            background: linear-gradient(135deg, #1e293b, #0f172a);
-            color: white; transform: rotateY(180deg); padding: 1.5rem;
-        }
-        
-        /* SCROLLBAR HIDING */
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    </style>
-</head>
-<body>
-<div id="root"></div>
-
-<script type="text/babel">
-    const { useState, useEffect, useRef } = React;
-	/* --- CHUNK 2: KANJI DATA --- */
-
-    const KANJI_N5 = [
-        // NUMBERS
-        { char: "一", mean: "One", on: "Ichi", kun: "Hito", trick: "Just one stroke." },
-        { char: "二", mean: "Two", on: "Ni", kun: "Futa", trick: "1 + 1 = 2 (Two lines)." },
-        { char: "三", mean: "Three", on: "San", kun: "Mittsu", trick: "1 + 2 = 3 (Three lines)." },
-        { char: "四", mean: "Four", on: "Shi", kun: "Yon", trick: "There are four sides to a square." },
-        { char: "五", mean: "Five", on: "Go", kun: "Itsu", trick: "It looks like the number 5." },
-        { char: "六", mean: "Six", on: "Roku", kun: "Mu", trick: "Looks like 'VI' (6) upside down." },
-        { char: "七", mean: "Seven", on: "Shichi", kun: "Nana", trick: "It is a 7 inverted." },
-        { char: "八", mean: "Eight", on: "Hachi", kun: "Ya", trick: "Follow the lines to make an '8'." },
-        { char: "九", mean: "Nine", on: "Kyuu", kun: "Kokono", trick: "Looks like '9' with imagination." },
-        { char: "十", mean: "Ten", on: "Juu", kun: "Too", trick: "Roman numeral X is 10." },
-        { char: "百", mean: "Hundred", on: "Hyaku", kun: "-", trick: "Rotate 100 to get 百." },
-        { char: "千", mean: "Thousand", on: "Sen", kun: "Chi", trick: "Thousand starts with T." },
-        { char: "万", mean: "10,000", on: "Man", kun: "-", trick: "Capital T + h combined." },
-        
-        // NATURE
-        { char: "日", mean: "Sun/Day", on: "Nichi", kun: "Hi", trick: "Shape of the sun (squared)." },
-        { char: "月", mean: "Moon/Month", on: "Getsu", kun: "Tsuki", trick: "Looks like a quarter moon." },
-        { char: "火", mean: "Fire", on: "Ka", kun: "Hi", trick: "A campfire with flames flying." },
-        { char: "水", mean: "Water", on: "Sui", kun: "Mizu", trick: "Represents a current of water." },
-        { char: "木", mean: "Tree", on: "Moku", kun: "Ki", trick: "Looks like a tree with roots." },
-        { char: "金", mean: "Gold/Money", on: "Kin", kun: "Kane", trick: "King (王) divides gold in his house." },
-        { char: "土", mean: "Earth", on: "Do", kun: "Tsuchi", trick: "A cross on a grave in the earth." },
-        { char: "山", mean: "Mountain", on: "San", kun: "Yama", trick: "Shape of mountain peaks." },
-        { char: "川", mean: "River", on: "Sen", kun: "Kawa", trick: "Three lines flowing like a river." },
-        { char: "天", mean: "Heaven", on: "Ten", kun: "Ama", trick: "Heaven is one (一) big (大) place." },
-        
-        // PEOPLE & DIRECTIONS
-        { char: "人", mean: "Person", on: "Jin", kun: "Hito", trick: "A man standing, legs spread." },
-        { char: "口", mean: "Mouth", on: "Kou", kun: "Kuchi", trick: "A mouth wide open." },
-        { char: "目", mean: "Eye", on: "Moku", kun: "Me", trick: "Shape of an eye (vertical)." },
-        { char: "耳", mean: "Ear", on: "Ji", kun: "Mimi", trick: "An ear with a hole in the middle." },
-        { char: "手", mean: "Hand", on: "Shu", kun: "Te", trick: "Simplified hand giving a thumb down." },
-        { char: "北", mean: "North", on: "Hoku", kun: "Kita", trick: "Two people sitting back to back." },
-        { char: "東", mean: "East", on: "Tou", kun: "Higashi", trick: "Sun (日) rising behind a tree (木)." },
-        { char: "西", mean: "West", on: "Sei", kun: "Nishi", trick: "Birds nesting in the west." },
-        { char: "南", mean: "South", on: "Nan", kun: "Minami", trick: "A tropical plant growing south." }
-    ];
-	/* --- CHUNK 3: LESSON DATA & SAKURA ENGINE --- */
-
-    const DATABASE = {
-        levels: ["N5", "N4", "N3", "N2", "N1"],
-        kanji: KANJI_N5,
-        lessons: {
-            "N5": [
-                {
-                    id: 1, title: "Identity & Greetings", desc: "Start here! X is Y",
-                    vocab: [
-                        { jp: "わたし", romaji: "Watashi", en: "I / Me" },
-                        { jp: "がくせい", romaji: "Gakusei", en: "Student" },
-                        { jp: "せんせい", romaji: "Sensei", en: "Teacher" }
-                    ],
-                    grammar: [
-                        { title: "X wa Y desu", rule: "X は Y です", expl: "Basic sentence: 'I am a student' -> Watashi wa gakusei desu." },
-                        { title: "Particle WA (は)", rule: "Topic Marker", expl: "Marks the topic. Pronounced 'wa' when used as a particle." }
-                    ],
-                    quiz: [
-                        { q: "Translate: I am a student.", options: ["Watashi wa sensei desu", "Watashi wa gakusei desu", "Anata wa gakusei desu"], correct: 1 },
-                        { q: "Which particle marks the topic?", options: ["ka (か)", "wa (は)", "no (の)"], correct: 1 }
-                    ]
-                },
-                {
-                    id: 2, title: "Demonstratives", desc: "Kore, Sore, Are",
-                    vocab: [
-                        { jp: "これ", romaji: "Kore", en: "This (near me)" },
-                        { jp: "それ", romaji: "Sore", en: "That (near you)" },
-                        { jp: "あれ", romaji: "Are", en: "That (over there)" }
-                    ],
-                    grammar: [
-                        { title: "Kore / Sore / Are", rule: "Pointing words", expl: "Kore (This), Sore (That), Are (That over there)." },
-                        { title: "Ka (か)", rule: "Question Particle", expl: "Add 'ka' at the end to make a question." }
-                    ],
-                    quiz: [
-                        { q: "How do you say 'This'?", options: ["Kore", "Sore", "Are"], correct: 0 },
-                        { q: "What is the question particle?", options: ["Ne", "Yo", "Ka"], correct: 2 }
-                    ]
-                }
-            ]
-        }
-    };
-
-    // --- SAKURA BACKGROUND COMPONENT ---
-    const SakuraBackground = () => {
-        const canvasRef = useRef(null);
-
-        useEffect(() => {
-            const canvas = canvasRef.current;
-            const ctx = canvas.getContext('2d');
-            let animationFrameId;
-
-            const resize = () => {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-            };
-            window.addEventListener('resize', resize);
-            resize();
-
-            const petals = Array.from({ length: 40 }, () => ({
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
-                size: Math.random() * 10 + 5,
-                speedY: Math.random() * 1 + 0.5,
-                speedX: Math.random() * 1 - 0.5,
-                opacity: Math.random() * 0.5 + 0.3
-            }));
-
-            const draw = () => {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                petals.forEach(p => {
-                    ctx.beginPath();
-                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-                    ctx.fillStyle = `rgba(255, 183, 197, ${p.opacity})`;
-                    ctx.fill();
-                    p.y += p.speedY;
-                    p.x += p.speedX;
-                    if (p.y > canvas.height) p.y = -20;
-                    if (p.x > canvas.width) p.x = 0;
-                    if (p.x < 0) p.x = canvas.width;
-                });
-                animationFrameId = requestAnimationFrame(draw);
-            };
-            draw();
-            return () => {
-                window.removeEventListener('resize', resize);
-                cancelAnimationFrame(animationFrameId);
-            };
-        }, []);
-
-        return <canvas ref={canvasRef} className="sakura-container" />;
-    };
-	/* --- CHUNK 4: COMPONENTS (KANJI & DASHBOARD) --- */
-
-    // 1. KANJI FLIP CARD
-    const KanjiCard = ({ data }) => {
-        return (
-            <div className="kanji-card w-40 h-56 bg-transparent cursor-pointer perspective-1000 group">
-                <div className="kanji-card-inner duration-500 relative w-full h-full border-2 border-pink-100 rounded-2xl bg-white">
-                    {/* FRONT */}
-                    <div className="kanji-front shadow-sm">
-                        <div className="text-6xl font-black text-slate-800 mb-2 jp">{data.char}</div>
-                        <div className="text-sm font-bold text-pink-500 uppercase tracking-widest">{data.mean}</div>
-                        <div className="mt-4 w-full px-4">
-                            <div className="flex justify-between text-xs text-slate-500 border-b border-slate-100 pb-1">
-                                <span>ON:</span> <span className="font-bold">{data.on}</span>
-                            </div>
-                            <div className="flex justify-between text-xs text-slate-500 pt-1">
-                                <span>KUN:</span> <span className="font-bold">{data.kun}</span>
-                            </div>
-                        </div>
-                    </div>
-                    {/* BACK */}
-                    <div className="kanji-back">
-                        <h3 className="text-pink-300 font-bold text-sm mb-2 uppercase tracking-wider">Memory Trick</h3>
-                        <p className="text-sm font-medium leading-relaxed italic">"{data.trick}"</p>
-                        <div className="mt-4 text-xs text-slate-400">Hover to flip back</div>
-                    </div>
-                </div>
+        <div id="quizOptions" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
             </div>
-        );
-    };
+        <div id="quizResult" style="margin-top:20px; font-weight:bold; height: 30px;"></div>
+        <button onclick="closeQuiz()" style="margin-top: 20px; background: #eee; border: none; padding: 10px; border-radius: 5px; cursor: pointer;">Exit Quiz</button>
+    </div>
+</div>
+/* --- CHUNK 12: QUIZ LOGIC --- */
 
-    // 2. KANJI DASHBOARD
-    const KanjiDashboard = ({ onBack }) => {
-        return (
-            <div className="max-w-6xl mx-auto p-6 fade-in h-full overflow-y-auto no-scrollbar pb-32 relative z-10">
-                <div className="flex items-center mb-8 sticky top-0 bg-[#f8fafc] z-20 py-4">
-                    <button onClick={onBack} className="bg-white p-3 rounded-full shadow-sm hover:shadow-md transition-all mr-4 text-slate-600">
-                        ← Back
-                    </button>
-                    <div>
-                        <h1 className="text-3xl font-bold text-slate-800">N5 Kanji Master</h1>
-                        <p className="text-slate-500">Hover to see memory tricks!</p>
-                    </div>
-                </div>
-                <div className="flex flex-wrap gap-6 justify-center pb-20">
-                    {DATABASE.kanji.map((k, idx) => (
-                        <div key={idx} className="slide-up" style={{animationDelay: idx * 0.05 + 's'}}>
-                            <KanjiCard data={k} />
-                        </div>
-                    ))}
-                </div>
-            </div>
-        );
-    };
+function startKanjiQuiz() {
+    const overlay = document.getElementById('quizOverlay');
+    overlay.style.display = 'flex';
+    nextQuizQuestion();
+}
 
-    // 3. LESSON DASHBOARD (Restored)
-    const LessonDashboard = ({ level, onBack, onSelectLesson }) => {
-        const lessons = DATABASE.lessons[level] || [];
-        return (
-            <div className="p-8 max-w-4xl mx-auto fade-in relative z-10">
-                <button onClick={onBack} className="mb-6 text-slate-500 hover:text-pink-500 font-bold">← Back to Home</button>
-                <h2 className="text-4xl font-bold text-slate-800 mb-2">Level {level}</h2>
-                <p className="text-slate-500 mb-8">Select a module to begin learning.</p>
-                <div className="grid gap-4">
-                    {lessons.map((l, i) => (
-                        <div key={l.id} onClick={() => onSelectLesson(l)} 
-                             className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 cursor-pointer hover:border-pink-300 hover:shadow-md transition-all slide-up"
-                             style={{animationDelay: i * 0.1 + 's'}}>
-                            <div className="flex justify-between items-center">
-                                <div>
-                                    <h3 className="text-xl font-bold text-slate-700">Lesson {l.id}: {l.title}</h3>
-                                    <p className="text-slate-500 text-sm">{l.desc}</p>
-                                </div>
-                                <div className="bg-pink-100 text-pink-600 px-4 py-2 rounded-full font-bold text-sm">Start</div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
-        );
-    };
-	/* --- CHUNK 5: LESSON VIEW & APP LOGIC --- */
-
-    const LessonView = ({ lesson, onBack }) => {
-        const [tab, setTab] = useState('vocab'); // vocab, grammar, quiz
-        const [quizIdx, setQuizIdx] = useState(0);
-        const [score, setScore] = useState(0);
-        const [showScore, setShowScore] = useState(false);
-
-        const handleAnswer = (optIndex) => {
-            if (optIndex === lesson.quiz[quizIdx].correct) setScore(s => s + 1);
-            if (quizIdx + 1 < lesson.quiz.length) {
-                setQuizIdx(q => q + 1);
+function nextQuizQuestion() {
+    const resultDiv = document.getElementById('quizResult');
+    resultDiv.innerText = "";
+    
+    // Pick random Kanji
+    const correctKanji = n5MasterList[Math.floor(Math.random() * n5MasterList.length)];
+    
+    document.getElementById('quizChar').innerText = correctKanji.char;
+    
+    // Generate 3 wrong answers
+    const options = [correctKanji];
+    while(options.length < 4) {
+        const random = n5MasterList[Math.floor(Math.random() * n5MasterList.length)];
+        if (!options.includes(random)) options.push(random);
+    }
+    
+    // Shuffle options
+    options.sort(() => Math.random() - 0.5);
+    
+    const optionsContainer = document.getElementById('quizOptions');
+    optionsContainer.innerHTML = '';
+    
+    options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.innerText = opt.meaning;
+        btn.style.padding = "15px";
+        btn.style.fontSize = "1.2rem";
+        btn.style.cursor = "pointer";
+        btn.style.border = "1px solid #ddd";
+        btn.style.borderRadius = "8px";
+        btn.style.background = "white";
+        
+        btn.onclick = () => {
+            if(opt === correctKanji) {
+                btn.style.background = "#2ecc71";
+                btn.style.color = "white";
+                resultDiv.innerText = "Correct! Next...";
+                resultDiv.style.color = "#2ecc71";
+                setTimeout(nextQuizQuestion, 1000);
             } else {
-                setShowScore(true);
+                btn.style.background = "#ff6b6b";
+                btn.style.color = "white";
+                resultDiv.innerText = "Try Again!";
+                resultDiv.style.color = "#ff6b6b";
             }
         };
+        optionsContainer.appendChild(btn);
+    });
+}
 
-        return (
-            <div className="max-w-3xl mx-auto p-6 h-full flex flex-col fade-in relative z-10">
-                {/* Header */}
-                <div className="flex items-center justify-between mb-6">
-                    <button onClick={onBack} className="text-slate-400 hover:text-slate-600">✕ Close</button>
-                    <h2 className="font-bold text-slate-700">{lesson.title}</h2>
-                    <div className="w-8"></div>
-                </div>
-
-                {/* Tabs */}
-                <div className="flex bg-white rounded-xl p-1 shadow-sm mb-6">
-                    {['vocab', 'grammar', 'quiz'].map(t => (
-                        <button key={t} onClick={() => setTab(t)} 
-                            className={`flex-1 py-2 rounded-lg text-sm font-bold capitalize transition-all ${tab === t ? 'bg-pink-500 text-white shadow-md' : 'text-slate-500 hover:bg-slate-50'}`}>
-                            {t}
-                        </button>
-                    ))}
-                </div>
-
-                {/* Content */}
-                <div className="flex-1 overflow-y-auto bg-white rounded-3xl shadow-sm p-8 border border-slate-100">
-                    {tab === 'vocab' && (
-                        <div className="space-y-4">
-                            {lesson.vocab.map((v, i) => (
-                                <div key={i} className="flex justify-between items-center border-b border-slate-50 py-3">
-                                    <div>
-                                        <div className="text-xl font-bold text-slate-800 jp">{v.jp}</div>
-                                        <div className="text-xs text-slate-400">{v.romaji}</div>
-                                    </div>
-                                    <div className="text-slate-600 font-medium">{v.en}</div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-
-                    {tab === 'grammar' && (
-                        <div className="space-y-6">
-                            {lesson.grammar.map((g, i) => (
-                                <div key={i} className="bg-slate-50 p-5 rounded-xl">
-                                    <h3 className="font-bold text-pink-500 mb-1">{g.title}</h3>
-                                    <div className="text-xl text-slate-800 mb-2 jp">{g.rule}</div>
-                                    <p className="text-sm text-slate-600 leading-relaxed">{g.expl}</p>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-
-                    {tab === 'quiz' && (
-                        <div className="text-center h-full flex flex-col justify-center">
-                            {!showScore ? (
-                                <div className="slide-up">
-                                    <div className="text-xs font-bold text-pink-400 mb-4">QUESTION {quizIdx + 1} / {lesson.quiz.length}</div>
-                                    <h3 className="text-xl font-bold text-slate-800 mb-8">{lesson.quiz[quizIdx].q}</h3>
-                                    <div className="space-y-3">
-                                        {lesson.quiz[quizIdx].options.map((opt, i) => (
-                                            <button key={i} onClick={() => handleAnswer(i)}
-                                                className="w-full py-4 rounded-xl border-2 border-slate-100 font-bold text-slate-600 hover:border-pink-500 hover:bg-pink-50 transition-all">
-                                                {opt}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className="slide-up">
-                                    <div className="text-6xl mb-4">🎉</div>
-                                    <h2 className="text-2xl font-bold text-slate-800 mb-2">Quiz Complete!</h2>
-                                    <p className="text-slate-500 mb-8">You scored {score} out of {lesson.quiz.length}</p>
-                                    <button onClick={() => { setQuizIdx(0); setScore(0); setShowScore(false); }} 
-                                        className="bg-slate-800 text-white px-8 py-3 rounded-xl font-bold hover:bg-slate-900">Try Again</button>
-                                </div>
-                            )}
-                        </div>
-                    )}
-                </div>
-            </div>
-        );
-    };
-
-    // --- MAIN APP ---
-    const App = () => {
-        const [view, setView] = useState('home'); 
-        const [currentLevel, setCurrentLevel] = useState(null);
-        const [currentLesson, setCurrentLesson] = useState(null);
-
-        const handleLevelSelect = (lvl) => {
-            if (lvl === "N5") {
-                setCurrentLevel(lvl);
-                setView('level');
-            } else {
-                alert("N4-N1 are coming soon!");
-            }
-        };
-
-        const handleLessonSelect = (lesson) => {
-            setCurrentLesson(lesson);
-            setView('lesson');
-        };
-
-        return (
-            <div className="h-full w-full relative">
-                <SakuraBackground />
-                
-                {view === 'home' && (
-                    <div className="h-full w-full flex flex-col items-center justify-center relative z-20">
-                        <div className="text-center mb-12 slide-up">
-                            <h1 className="text-7xl font-black text-slate-800 mb-2 tracking-tighter">
-                                <span className="text-pink-500">Nihongo</span> Pro
-                            </h1>
-                            <p className="text-slate-500 text-lg font-light tracking-widest">ULTIMATE EDITION</p>
-                        </div>
-                        <div className="grid grid-cols-2 gap-6 max-w-2xl w-full px-6">
-                            <button onClick={() => handleLevelSelect("N5")}
-                                className="col-span-2 bg-white/80 backdrop-blur-md p-8 rounded-3xl border border-white/50 hover:bg-white hover:scale-[1.02] hover:shadow-xl transition-all group text-left">
-                                <div className="text-2xl font-bold text-slate-800 mb-1 group-hover:text-pink-500 transition-colors">Start Lessons</div>
-                                <div className="text-slate-500">Grammar, Vocab & Quizzes</div>
-                            </button>
-                            <button onClick={() => setView('kanji')}
-                                className="col-span-2 bg-gradient-to-r from-slate-800 to-slate-900 text-white p-8 rounded-3xl hover:scale-[1.02] hover:shadow-2xl transition-all text-left relative overflow-hidden">
-                                <div className="relative z-10">
-                                    <div className="text-2xl font-bold mb-1 text-pink-300">Kanji Dictionary</div>
-                                    <div className="text-slate-400">Master N5 Kanji with Memory Tricks</div>
-                                </div>
-                                <div className="absolute right-[-20px] bottom-[-20px] text-9xl opacity-10 font-black">字</div>
-                            </button>
-                        </div>
-                    </div>
-                )}
-
-                {view === 'kanji' && <KanjiDashboard onBack={() => setView('home')} />}
-                {view === 'level' && <LessonDashboard level={currentLevel} onBack={() => setView('home')} onSelectLesson={handleLessonSelect} />}
-                {view === 'lesson' && <LessonView lesson={currentLesson} onBack={() => setView('level')} />}
-            </div>
-        );
-    };
-
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<App />);
-</script>
-</body>
-</html>
+function closeQuiz() {
+    document.getElementById('quizOverlay').style.display = 'none';
+}
