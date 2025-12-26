@@ -228,35 +228,77 @@
                 ]
             }
         };
-		        // --- COMPONENTS ---
+		                // --- COMPONENTS ---
 
-        // 1. Level Selector (Home)
+        // 1. Level Selector (Home) - UPDATED WITH STORY
         const LevelSelect = ({ onSelect }) => (
-            <div className="h-full w-full overflow-y-auto flex flex-col items-center justify-center p-4 fade-in relative z-10">
+            <div className="h-full w-full overflow-y-auto flex flex-col items-center p-4 fade-in relative z-10 scroll-smooth">
                 <SakuraBackground />
-                <div className="w-full max-w-5xl text-center my-auto py-10 glass-panel rounded-3xl shadow-2xl p-8 md:p-12">
-                    <div className="mb-8">
-                        <span className="inline-block py-1 px-3 rounded-full bg-pink-100 text-pink-600 text-sm font-bold tracking-wider mb-2">ULTIMATE EDITION</span>
-                        <h1 className="text-5xl md:text-7xl font-extrabold mb-2 text-slate-800 tracking-tight">NIHONGO <span className="text-pink-500">PRO</span></h1>
-                        <p className="text-slate-500 text-lg md:text-xl font-medium">Master Minna no Nihongo (L1 - L25)</p>
+                
+                {/* Main Container */}
+                <div className="w-full max-w-4xl my-auto py-10 flex flex-col gap-8">
+                    
+                    {/* Header */}
+                    <div className="text-center">
+                        <span className="inline-block py-1 px-3 rounded-full bg-pink-100 text-pink-600 text-xs font-bold tracking-wider mb-2">ULTIMATE EDITION</span>
+                        <h1 className="text-5xl md:text-7xl font-extrabold text-slate-800 tracking-tight">NIHONGO <span className="text-pink-500">PRO</span></h1>
+                    </div>
+
+                    {/* THE STORY CARD - "The Heart of the App" */}
+                    <div className="glass-panel rounded-3xl p-8 md:p-10 relative overflow-hidden group hover:shadow-pink-100/50 hover:shadow-2xl transition-all duration-500 border-l-4 border-l-pink-400">
+                        {/* Decorative Quote Mark */}
+                        <div className="absolute top-2 right-6 text-9xl text-pink-100 font-serif opacity-50 select-none">”</div>
+                        
+                        <div className="relative z-10">
+                            <h3 className="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-3">
+                                <span className="w-10 h-10 rounded-full bg-pink-500 flex items-center justify-center text-white text-lg font-bold shadow-md">P</span>
+                                Hi, I’m Piyush Pal.
+                            </h3>
+                            
+                            <div className="space-y-4 text-slate-600 leading-relaxed text-lg font-medium">
+                                <p>
+                                    I built <span className="text-pink-600 font-bold">Nihongo Pro</span> from my heart.
+                                </p>
+                                <p>
+                                    Japan has always inspired me — not just the language, but the discipline, calmness, and respect for effort.
+                                </p>
+                                <p>
+                                    When I started learning Japanese, I felt lost between too many resources and no clear path. So I decided to build my own.
+                                    Every lesson here is something I personally studied, struggled with, and simplified for clarity.
+                                </p>
+                                <p>
+                                    Nihongo Pro follows the JLPT N5 structure, but it’s designed to feel <span className="italic text-slate-800">peaceful, logical, and human.</span>
+                                </p>
+                                <p className="pt-2">
+                                    This platform will grow as I grow. If you’re learning Japanese with genuine curiosity — <span className="text-pink-600 font-bold">welcome.</span>
+                                </p>
+                            </div>
+
+                            <div className="mt-8 pt-6 border-t border-slate-200/60 flex justify-between items-center">
+                                <div className="text-xs font-bold text-pink-400 uppercase tracking-widest">CREATOR & DEVELOPER</div>
+                                <div className="font-serif italic text-slate-400 text-xl pr-4">Piyush Pal</div>
+                            </div>
+                        </div>
                     </div>
                     
-                    <div className="grid grid-cols-1 sm:grid-cols-5 gap-4 w-full">
-                        {DATABASE.levels.map((lvl) => (
-                            <button 
-                                key={lvl}
-                                onClick={() => onSelect(lvl)}
-                                className={`group relative p-6 rounded-2xl border-2 transition-all duration-300 overflow-hidden ${lvl === 'N5' ? 'border-pink-400 bg-white/80 shadow-lg hover:shadow-pink-200/50 hover:-translate-y-1 cursor-pointer' : 'border-slate-200 bg-slate-50/50 text-slate-300 cursor-not-allowed'}`}
-                            >
-                                <div className={`absolute inset-0 bg-pink-500 opacity-0 ${lvl === 'N5' ? 'group-hover:opacity-5' : ''} transition-opacity`}></div>
-                                <span className={`text-3xl font-bold relative z-10 ${lvl === 'N5' ? 'text-slate-800' : ''}`}>{lvl}</span>
-                                {lvl === 'N5' && <div className="text-xs text-pink-500 font-bold mt-1">UNLOCKED</div>}
-                            </button>
-                        ))}
+                    {/* Level Selection */}
+                    <div>
+                        <p className="text-slate-400 text-center mb-6 text-sm font-bold uppercase tracking-widest">Select Your Path</p>
+                        <div className="grid grid-cols-1 sm:grid-cols-5 gap-4 w-full">
+                            {DATABASE.levels.map((lvl) => (
+                                <button 
+                                    key={lvl}
+                                    onClick={() => onSelect(lvl)}
+                                    className={`group relative p-6 rounded-2xl border-2 transition-all duration-300 overflow-hidden ${lvl === 'N5' ? 'border-pink-400 bg-white/80 shadow-lg hover:shadow-pink-200/50 hover:-translate-y-1 cursor-pointer' : 'border-slate-200 bg-slate-50/50 text-slate-300 cursor-not-allowed'}`}
+                                >
+                                    <div className={`absolute inset-0 bg-pink-500 opacity-0 ${lvl === 'N5' ? 'group-hover:opacity-5' : ''} transition-opacity`}></div>
+                                    <span className={`text-3xl font-bold relative z-10 ${lvl === 'N5' ? 'text-slate-800' : ''}`}>{lvl}</span>
+                                    {lvl === 'N5' && <div className="text-xs text-pink-500 font-bold mt-1">UNLOCKED</div>}
+                                </button>
+                            ))}
+                        </div>
                     </div>
-                    <div className="mt-8 text-slate-400 text-sm">
-                        Contains {DATABASE.lessons["N5"].length} Lessons • Grammar • Vocab • Quizzes
-                    </div>
+
                 </div>
             </div>
         );
