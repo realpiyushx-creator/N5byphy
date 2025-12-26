@@ -18,18 +18,28 @@
         body { font-family: 'Quicksand', sans-serif; overflow: hidden; }
         .jp { font-family: 'Zen Maru Gothic', sans-serif; }
         
-        /* SAKURA ANIMATION */
-        .sakura-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: hidden; }
+        /* SAKURA ANIMATION (FOREGROUND UPDATE) */
+        .sakura-container { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            pointer-events: none; /* CRITICAL: Lets clicks pass through petals */
+            z-index: 50; /* MOVED TO FRONT */
+            overflow: hidden; 
+        }
         .petal {
             position: absolute;
             background-color: #ffc0cb;
             border-radius: 100% 0% 100% 0%;
             opacity: 0.8;
             animation: fall linear infinite;
+            box-shadow: 0 0 5px rgba(255, 192, 203, 0.5); /* Added glow for depth */
         }
         @keyframes fall {
             0% { transform: translate(0, -10vh) rotate(0deg); opacity: 0; }
-            10% { opacity: 0.8; }
+            10% { opacity: 0.9; }
             100% { transform: translate(100px, 110vh) rotate(360deg); opacity: 0; }
         }
 
@@ -39,11 +49,14 @@
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         
+        /* GLASS EFFECTS */
         .glass-panel {
             background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.5);
+            position: relative;
+            z-index: 10; /* Content sits behind petals now */
         }
         
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -56,14 +69,15 @@
 
     <script type="text/babel">
         const { useState, useEffect, useMemo } = React;
-		        // --- SAKURA GENERATOR COMPONENT ---
+
+        // --- SAKURA GENERATOR COMPONENT ---
         const SakuraBackground = () => {
             const petals = useMemo(() => {
-                return [...Array(25)].map((_, i) => ({
+                return [...Array(30)].map((_, i) => ({ // Increased petal count slightly
                     id: i,
                     left: Math.random() * 100 + "%",
-                    width: Math.random() * 10 + 10 + "px",
-                    height: Math.random() * 10 + 10 + "px",
+                    width: Math.random() * 15 + 10 + "px", // Made some petals slightly bigger
+                    height: Math.random() * 15 + 10 + "px",
                     animationDuration: Math.random() * 5 + 8 + "s",
                     animationDelay: Math.random() * 5 + "s"
                 }));
@@ -83,6 +97,7 @@
 
         // --- DATABASE ENGINE ---
         const DATABASE = {
+
             levels: ["N5", "N4", "N3", "N2", "N1"],
             lessons: {
                 "N5": [
