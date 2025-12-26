@@ -1,743 +1,500 @@
-/* --- CHUNK 1: KANJI STYLES --- */
-/* Add this to your styles.css */
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nihongo Pro - N5 Kanji Master</title>
+    <style>
+        /* --- GLOBAL STYLES --- */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+            color: #333;
+        }
 
-#kanji-section {
-    padding: 4rem 2rem;
-    background-color: #f8f9fa;
-}
+        /* --- KANJI SECTION STYLES --- */
+        #kanji-section {
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
 
-.kanji-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 1.5rem;
-    margin-top: 2rem;
-}
+        .section-header h2 {
+            color: #2d3436;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
 
-.kanji-card {
-    background: white;
-    border-radius: 12px;
-    padding: 1.5rem;
-    text-align: center;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
-    border: 2px solid transparent;
-}
+        .highlight {
+            color: #ff4757;
+            font-weight: bold;
+        }
 
-.kanji-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 15px rgba(0,0,0,0.1);
-    border-color: #ff4757;
-}
+        /* Controls Area */
+        .kanji-controls {
+            margin-bottom: 30px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
 
-.kanji-char {
-    font-size: 4rem;
-    font-weight: bold;
-    color: #2d3436;
-    margin-bottom: 0.5rem;
-    font-family: 'Noto Sans JP', sans-serif;
-}
+        #kanjiSearch {
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+            width: 100%;
+            max-width: 300px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
 
-.kanji-meaning {
-    font-size: 1.1rem;
-    color: #636e72;
-    font-weight: 500;
-}
+        #kanjiSearch:focus {
+            outline: none;
+            border-color: #ff4757;
+        }
 
-/* Modal for Memory Tricks */
-.kanji-modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.7);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    backdrop-filter: blur(5px);
-}
+        .quiz-btn {
+            padding: 12px 25px;
+            background: #ff4757;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: background 0.2s;
+        }
 
-.kanji-modal {
-    background: white;
-    width: 90%;
-    max-width: 600px;
-    border-radius: 20px;
-    padding: 2rem;
-    position: relative;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-    animation: slideUp 0.3s ease-out;
-}
+        .quiz-btn:hover {
+            background: #e04050;
+        }
 
-@keyframes slideUp {
-    from { transform: translateY(50px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-}
+        /* Grid System */
+        .kanji-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
 
-.close-modal {
-    position: absolute;
-    top: 1rem;
-    right: 1.5rem;
-    font-size: 2rem;
-    cursor: pointer;
-    color: #aaa;
-}
+        .kanji-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem 1rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 2px solid transparent;
+        }
 
-.memory-trick-box {
-    background: #fff3cd;
-    border-left: 5px solid #ffc107;
-    padding: 1rem;
-    margin: 1.5rem 0;
-    border-radius: 4px;
-    font-style: italic;
-    color: #5d4037;
-}
+        .kanji-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 25px rgba(0,0,0,0.1);
+            border-color: #ff4757;
+        }
 
-.readings-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-    margin-top: 1rem;
-    text-align: left;
-}
+        .kanji-char {
+            font-size: 4rem;
+            font-weight: bold;
+            color: #2d3436;
+            margin-bottom: 0.5rem;
+            font-family: 'Noto Sans JP', sans-serif; /* Ensure you have a JP font if possible */
+        }
 
-.reading-type {
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    color: #b2bec3;
-    margin-bottom: 0.2rem;
-    letter-spacing: 1px;
-}
-<section id="kanji-section">
-    <div class="section-header">
-        <h2>N5 Kanji Challenge</h2>
-        <p>Unlock the power of <span class="highlight">Memory Tricks</span>. Click a card to reveal the story behind the character.</p>
-    </div>
+        .kanji-meaning {
+            font-size: 1.1rem;
+            color: #636e72;
+            font-weight: 600;
+        }
 
-    <div class="kanji-controls" style="margin-bottom: 20px; display: flex; gap: 10px;">
-        <input type="text" id="kanjiSearch" placeholder="Search meaning (e.g., 'Tree', 'Sun')..." 
-               style="padding: 10px; border-radius: 8px; border: 1px solid #ddd; width: 100%; max-width: 300px;">
-    </div>
+        /* --- MODAL STYLES --- */
+        .kanji-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: none; /* Hidden by default */
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
 
-    <div class="kanji-grid" id="kanjiGrid">
-        </div>
-</section>
+        .kanji-modal {
+            background: white;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 20px;
+            padding: 2.5rem;
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            animation: slideUp 0.3s ease-out;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
 
-<div class="kanji-modal-overlay" id="kanjiModalOverlay">
-    <div class="kanji-modal">
-        <span class="close-modal" onclick="closeKanjiModal()">&times;</span>
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            font-size: 2.5rem;
+            line-height: 1;
+            cursor: pointer;
+            color: #aaa;
+            transition: color 0.2s;
+        }
+
+        .close-modal:hover { color: #ff4757; }
+
+        .memory-trick-box {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 1.2rem;
+            margin: 1.5rem 0;
+            border-radius: 0 4px 4px 0;
+            color: #5d4037;
+            line-height: 1.6;
+        }
+
+        .readings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-top: 1rem;
+            text-align: left;
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        .reading-type {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: #b2bec3;
+            margin-bottom: 0.4rem;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+
+        /* Quiz Specifics */
+        #quizOptions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
         
-        <div style="text-align: center; margin-bottom: 1rem;">
-            <div id="modalKanjiChar" style="font-size: 6rem; color: #2d3436;"></div>
-            <h3 id="modalKanjiMeaning" style="font-size: 2rem; color: #ff4757; margin: 0;"></h3>
+        .quiz-option-btn {
+            padding: 15px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            border: 2px solid #eee;
+            border-radius: 12px;
+            background: white;
+            transition: all 0.2s;
+            color: #555;
+            font-weight: bold;
+        }
+        
+        .quiz-option-btn:hover {
+            border-color: #aaa;
+            background: #f9f9f9;
+        }
+
+    </style>
+</head>
+<body>
+
+    <section id="kanji-section">
+        <div class="section-header">
+            <h2>N5 Kanji Challenge</h2>
+            <p>Unlock the power of <span class="highlight">Memory Tricks</span>. Click a card to reveal the story behind the character.</p>
         </div>
 
-        <div class="memory-trick-box">
-            <strong>🧠 Memory Trick:</strong>
-            <p id="modalMemoryTrick"></p>
+        <div class="kanji-controls">
+            <input type="text" id="kanjiSearch" placeholder="Search meaning (e.g., 'Tree', 'Sun')...">
+            <button onclick="startKanjiQuiz()" class="quiz-btn">🔥 Start Quiz</button>
         </div>
 
-        <hr style="border: 0; border-top: 1px solid #eee; margin: 1.5rem 0;">
-
-        <div class="readings-grid">
-            <div>
-                <div class="reading-type">Onyomi (Sound)</div>
-                <div id="modalOnyomi" style="font-weight: bold; font-size: 1.2rem;"></div>
+        <div class="kanji-grid" id="kanjiGrid">
             </div>
-            <div>
-                <div class="reading-type">Kunyomi (Meaning)</div>
-                <div id="modalKunyomi" style="font-weight: bold; font-size: 1.2rem;"></div>
+    </section>
+
+    <div class="kanji-modal-overlay" id="kanjiModalOverlay">
+        <div class="kanji-modal">
+            <span class="close-modal" onclick="closeKanjiModal()">&times;</span>
+            
+            <div style="text-align: center; margin-bottom: 1rem;">
+                <div id="modalKanjiChar" style="font-size: 6rem; color: #2d3436; line-height: 1;"></div>
+                <h3 id="modalKanjiMeaning" style="font-size: 2rem; color: #ff4757; margin: 10px 0 0 0;"></h3>
+            </div>
+
+            <div class="memory-trick-box">
+                <strong style="display:block; margin-bottom:5px;">🧠 Memory Trick:</strong>
+                <span id="modalMemoryTrick"></span>
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid #eee; margin: 1.5rem 0;">
+
+            <div class="readings-grid">
+                <div>
+                    <div class="reading-type">Onyomi (Sound)</div>
+                    <div id="modalOnyomi" style="font-weight: bold; font-size: 1.1rem; color: #333;"></div>
+                </div>
+                <div>
+                    <div class="reading-type">Kunyomi (Meaning)</div>
+                    <div id="modalKunyomi" style="font-weight: bold; font-size: 1.1rem; color: #333;"></div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 1.5rem; text-align: left;">
+                <div class="reading-type">Common Compounds</div>
+                <ul id="modalCompounds" style="list-style: none; padding: 0; margin-top: 0.5rem; color: #555;">
+                    </ul>
             </div>
         </div>
-        
-        <div style="margin-top: 1.5rem; text-align: left;">
-            <div class="reading-type">Common Compounds</div>
-            <ul id="modalCompounds" style="list-style: none; padding: 0; margin-top: 0.5rem;">
-                </ul>
+    </div>
+
+    <div id="quizOverlay" class="kanji-modal-overlay">
+        <div class="kanji-modal" style="text-align: center; max-width: 600px;">
+            <h3 style="color: #999; text-transform: uppercase; letter-spacing: 2px; font-size: 0.9rem;">What is this Kanji?</h3>
+            <div id="quizChar" style="font-size: 8rem; margin: 20px 0; color: #2d3436;"></div>
+            
+            <div id="quizOptions">
+                </div>
+
+            <div id="quizResult" style="margin-top:20px; font-weight:bold; height: 30px; font-size: 1.2rem;"></div>
+            
+            <button onclick="closeQuiz()" style="margin-top: 20px; background: transparent; border: 1px solid #ccc; padding: 10px 20px; border-radius: 5px; cursor: pointer; color: #777;">Exit Quiz</button>
         </div>
     </div>
-</div>
-/* --- CHUNK 3: KANJI DATA SET 1 --- */
-/* Add to script.js */
 
-const n5KanjiList = [
-    {
-        char: "日",
-        meaning: "Day / Sun",
-        onyomi: "NICHI, JITSU (ニチ, ジツ)",
-        kunyomi: "hi, -bi (ひ, -び)",
-        trick: "It is a picture of the **sun**. The rectangle is the shape, and the line in the middle is the sunspot or the heat radiating.",
-        compounds: [
-            "日本 (Nihon) - Japan",
-            "日曜日 (Nichiyoubi) - Sunday",
-            "毎日 (Mainichi) - Every day"
-        ]
-    },
-    {
-        char: "月",
-        meaning: "Month / Moon",
-        onyomi: "GETSU, GATSU (ゲツ, ガツ)",
-        kunyomi: "tsuki (つき)",
-        trick: "It looks like a **crescent moon** with two clouds floating in front of it.",
-        compounds: [
-            "月曜日 (Getsuyoubi) - Monday",
-            "一月 (Ichigatsu) - January",
-            "今月 (Kongetsu) - This month"
-        ]
-    },
-    {
-        char: "木",
-        meaning: "Tree",
-        onyomi: "MOKU, BOKU (モク, ボク)",
-        kunyomi: "ki (き)",
-        trick: "It looks exactly like a **tree**. The vertical line is the trunk, the horizontal line is the branches, and the bottom strokes are the roots.",
-        compounds: [
-            "木曜日 (Mokuyoubi) - Thursday",
-            "木 (Ki) - Tree",
-            "大木 (Taiboku) - Large tree"
-        ]
-    },
-    {
-        char: "山",
-        meaning: "Mountain",
-        onyomi: "SAN (サン)",
-        kunyomi: "yama (やま)",
-        trick: "A pictogram of a **mountain** with three peaks. The middle peak is the highest.",
-        compounds: [
-            "富士山 (Fujisan) - Mt. Fuji",
-            "山 (Yama) - Mountain",
-            "火山 (Kazan) - Volcano"
-        ]
-    },
-    {
-        char: "川",
-        meaning: "River",
-        onyomi: "SEN (セン)",
-        kunyomi: "kawa (かわ)",
-        trick: "Three lines flowing vertically, just like the water of a flowing **river**.",
-        compounds: [
-            "川 (Kawa) - River",
-            "小川 (Ogawa) - Stream/Brook",
-            "川上 (Kawakami) - Upstream"
-        ]
-    },
-    {
-        char: "田",
-        meaning: "Rice Field",
-        onyomi: "DEN (デン)",
-        kunyomi: "ta (た)",
-        trick: "A bird's eye view of a **rice paddy** divided into four sections by irrigation channels.",
-        compounds: [
-            "水田 (Suiden) - Paddy field",
-            "田中 (Tanaka) - (Common Surname)",
-            "田んぼ (Tanbo) - Rice field"
-        ]
-    }
-];
-// End of Chunk 3
-/* --- CHUNK 4: KANJI DATA SET 2 --- */
-/* Append to n5KanjiList using array push or just continue the array above */
-
-const n5KanjiListPart2 = [
-    {
-        char: "人",
-        meaning: "Person",
-        onyomi: "JIN, NIN (ジン, ニン)",
-        kunyomi: "hito (ひと)",
-        trick: "A side view of a **person** walking. The legs are striding forward.",
-        compounds: [
-            "日本人 (Nihonjin) - Japanese person",
-            "三人 (Sannin) - Three people",
-            "大人 (Otona) - Adult"
-        ]
-    },
-    {
-        char: "口",
-        meaning: "Mouth",
-        onyomi: "KOU, KU (コウ, ク)",
-        kunyomi: "kuchi (くち)",
-        trick: "A wide open **mouth**. It's just a square opening.",
-        compounds: [
-            "人口 (Jinkou) - Population",
-            "入口 (Iriguchi) - Entrance",
-            "出口 (Deguchi) - Exit"
-        ]
-    },
-    {
-        char: "車",
-        meaning: "Car / Vehicle",
-        onyomi: "SHA (シャ)",
-        kunyomi: "kuruma (くるま)",
-        trick: "A bird's eye view of a cart or **car**. You can see the two wheels (top and bottom lines) and the axle going through the middle.",
-        compounds: [
-            "電車 (Densha) - Train",
-            "自動車 (Jidousha) - Automobile",
-            "車 (Kuruma) - Car"
-        ]
-    },
-    {
-        char: "門",
-        meaning: "Gate",
-        onyomi: "MON (モン)",
-        kunyomi: "kado (かど)",
-        trick: "It looks like a pair of swinging saloon **gates**.",
-        compounds: [
-            "専門 (Senmon) - Major/Specialty",
-            "門 (Mon) - Gate",
-            "名門 (Meimon) - Distinguished family"
-        ]
-    },
-    {
-        char: "火",
-        meaning: "Fire",
-        onyomi: "KA (カ)",
-        kunyomi: "hi, bi (ひ, び)",
-        trick: "A person (人) waving their arms in panic because they are on **fire** (points on sides).",
-        compounds: [
-            "火曜日 (Kayoubi) - Tuesday",
-            "花火 (Hanabi) - Fireworks",
-            "火事 (Kaji) - Fire (accident)"
-        ]
-    },
-    {
-        char: "水",
-        meaning: "Water",
-        onyomi: "SUI (スイ)",
-        kunyomi: "mizu (みず)",
-        trick: "Water splashing out of a central stream. Imagine a fountain splashing **water** left and right.",
-        compounds: [
-            "水曜日 (Suiyoubi) - Wednesday",
-            "水 (Mizu) - Water",
-            "水着 (Mizugi) - Swimsuit"
-        ]
-    }
-];
-
-// Combine arrays
-const fullKanjiList = [...n5KanjiList, ...n5KanjiListPart2];
-/* --- CHUNK 5: JS LOGIC (RENDER) --- */
-
-const kanjiGrid = document.getElementById('kanjiGrid');
-const searchInput = document.getElementById('kanjiSearch');
-
-function renderKanji(data) {
-    kanjiGrid.innerHTML = ''; // Clear current grid
-
-    data.forEach((k, index) => {
-        const card = document.createElement('div');
-        card.className = 'kanji-card';
-        card.onclick = () => openKanjiModal(k); // We will define this next
-
-        // Card Content
-        card.innerHTML = `
-            <div class="kanji-char">${k.char}</div>
-            <div class="kanji-meaning">${k.meaning}</div>
-        `;
-
-        kanjiGrid.appendChild(card);
-    });
-}
-
-// Initial Render
-renderKanji(fullKanjiList);
-
-// Search Functionality
-searchInput.addEventListener('input', (e) => {
-    const term = e.target.value.toLowerCase();
-    
-    const filtered = fullKanjiList.filter(k => 
-        k.meaning.toLowerCase().includes(term) || 
-        k.kunyomi.toLowerCase().includes(term)
-    );
-    
-    renderKanji(filtered);
-});
-/* --- CHUNK 6: JS LOGIC (MODAL) --- */
-
-const modalOverlay = document.getElementById('kanjiModalOverlay');
-
-function openKanjiModal(kanjiData) {
-    // Populate Modal Elements
-    document.getElementById('modalKanjiChar').innerText = kanjiData.char;
-    document.getElementById('modalKanjiMeaning').innerText = kanjiData.meaning;
-    
-    // Inject Memory Trick (supports HTML like <b> or <strong>)
-    document.getElementById('modalMemoryTrick').innerHTML = kanjiData.trick;
-    
-    document.getElementById('modalOnyomi').innerText = kanjiData.onyomi;
-    document.getElementById('modalKunyomi').innerText = kanjiData.kunyomi;
-
-    // Populate Compounds List
-    const compoundsList = document.getElementById('modalCompounds');
-    compoundsList.innerHTML = ''; // Clear previous
-    kanjiData.compounds.forEach(comp => {
-        const li = document.createElement('li');
-        li.style.padding = "4px 0";
-        li.style.borderBottom = "1px dashed #eee";
-        li.innerText = comp;
-        compoundsList.appendChild(li);
-    });
-
-    // Show Modal
-    modalOverlay.style.display = 'flex';
-}
-
-function closeKanjiModal() {
-    modalOverlay.style.display = 'none';
-}
-
-// Close if clicking outside the modal card
-modalOverlay.addEventListener('click', (e) => {
-    if (e.target === modalOverlay) {
-        closeKanjiModal();
-    }
-});
-
-// Close on Escape key
-document.addEventListener('keydown', (e) => {
-    if (e.key === "Escape" && modalOverlay.style.display === 'flex') {
-        closeKanjiModal();
-    }
-});
-/* --- CHUNK 7: NUMBERS & COUNTING DATA --- */
-/* Copy this array and spread it into fullKanjiList */
-
-const kanjiNumbers = [
-    {
-        char: "一", meaning: "One",
-        onyomi: "ICHI, ITSU (イチ, イツ)", kunyomi: "hito (ひと)",
-        trick: "Just **one** finger holding up the number one.",
-        compounds: ["一日 (Tsuitachi) - 1st of month", "一つ (Hitotsu) - One thing"]
-    },
-    {
-        char: "二", meaning: "Two",
-        onyomi: "NI (ニ)", kunyomi: "futa (ふた)",
-        trick: "Two lines represent the number **two**.",
-        compounds: ["二月 (Nigatsu) - February", "二人 (Futari) - Two people"]
-    },
-    {
-        char: "三", meaning: "Three",
-        onyomi: "SAN (サン)", kunyomi: "mit (みっ)",
-        trick: "Three lines for the number **three**.",
-        compounds: ["三月 (Sangatsu) - March", "三日 (Mikka) - 3rd day"]
-    },
-    {
-        char: "四", meaning: "Four",
-        onyomi: "SHI (シ)", kunyomi: "yon, yo (よん, よ)",
-        trick: "It looks like a square window with curtains drawn. The corners make **four**.",
-        compounds: ["四月 (Shigatsu) - April", "四人 (Yonin) - Four people"]
-    },
-    {
-        char: "五", meaning: "Five",
-        onyomi: "GO (ゴ)", kunyomi: "itsu (いつ)",
-        trick: "Connect the dots of the number 5, and it looks a bit like this Kanji.",
-        compounds: ["五月 (Gogatsu) - May", "五円 (Goen) - 5 yen"]
-    },
-    {
-        char: "六", meaning: "Six",
-        onyomi: "ROKU (ロク)", kunyomi: "mut (むっ)",
-        trick: "A person doing jumping jacks with legs spread. **Six** reps!",
-        compounds: ["六月 (Rokugatsu) - June", "六つ (Muttsu) - Six things"]
-    },
-    {
-        char: "七", meaning: "Seven",
-        onyomi: "SHICHI (シチ)", kunyomi: "nana (なな)",
-        trick: "Imagine the number **7** turned upside down.",
-        compounds: ["七月 (Shichigatsu) - July", "七つ (Nanatsu) - Seven things"]
-    },
-    {
-        char: "八", meaning: "Eight",
-        onyomi: "HACHI (ハチ)", kunyomi: "yat (やっ)",
-        trick: "The shape of a volcano (Mt Fuji). In Japan, 8 is a lucky number because it widens at the bottom (prosperity).",
-        compounds: ["八月 (Hachigatsu) - August", "八百屋 (Yaoya) - Greengrocer"]
-    },
-    {
-        char: "九", meaning: "Nine",
-        onyomi: "KYUU, KU (キュウ, ク)", kunyomi: "kokono (ここの)",
-        trick: "It looks like a person doing a pushup, trying to do **nine** of them.",
-        compounds: ["九月 (Kugatsu) - September", "九つ (Kokonotsu) - Nine things"]
-    },
-    {
-        char: "十", meaning: "Ten",
-        onyomi: "JUU (ジュウ)", kunyomi: "tou (とう)",
-        trick: "A plus sign. Put two fives together (lines) to make **ten**.",
-        compounds: ["十月 (Juugatsu) - October", "十 (Tou) - Ten things"]
-    },
-    {
-        char: "百", meaning: "Hundred",
-        onyomi: "HYAKU (ヒャク)", kunyomi: "momo (もも)",
-        trick: "Take 'One' (一) and rotate 'White' (白) 90 degrees. One white standard represents a **hundred** soldiers.",
-        compounds: ["三百 (Sanbyaku) - 300", "百円 (Hyakuen) - 100 yen"]
-    },
-    {
-        char: "千", meaning: "Thousand",
-        onyomi: "SEN (セン)", kunyomi: "chi (ち)",
-        trick: "It combines 'One' (一) and 'Ten' (十) with a slash. 10 times 10 is... well, imagine it's a huge jump to a **thousand**.",
-        compounds: ["千円 (Senyen) - 1000 yen", "千葉 (Chiba) - Chiba Prefecture"]
-    },
-    {
-        char: "万", meaning: "Ten Thousand",
-        onyomi: "MAN (マン)", kunyomi: "—",
-        trick: "It looks like a variation of 'Five' (五) but simpler. It's a huge number, **10,000**.",
-        compounds: ["一万円 (Ichimanen) - 10,000 yen", "万国 (Bankoku) - All countries"]
-    },
-    {
-        char: "円", meaning: "Yen / Circle",
-        onyomi: "EN (エン)", kunyomi: "maru (まる)",
-        trick: "It looks like a teller window at a bank where you get **Yen**.",
-        compounds: ["百円 (Hyakuen) - 100 Yen", "円高 (Endaka) - Strong Yen"]
-    }
-];
-/* --- CHUNK 8: PEOPLE & SCHOOL DATA --- */
-
-const kanjiPeople = [
-    {
-        char: "父", meaning: "Father",
-        onyomi: "FU (フ)", kunyomi: "chichi (ちち)",
-        trick: "Two axes crossed above a face. The **father** provides/protects.",
-        compounds: ["お父さん (Otousan) - Father (polite)", "祖父 (Sofu) - Grandfather"]
-    },
-    {
-        char: "母", meaning: "Mother",
-        onyomi: "BO (ボ)", kunyomi: "haha (はは)",
-        trick: "The outline of a woman with two dots representing breasts. A nursing **mother**.",
-        compounds: ["お母さん (Okaasan) - Mother (polite)", "母国 (Bokoku) - Motherland"]
-    },
-    {
-        char: "友", meaning: "Friend",
-        onyomi: "YUU (ユウ)", kunyomi: "tomo (とも)",
-        trick: "Two hands holding each other. A symbol of **friendship**.",
-        compounds: ["友達 (Tomodachi) - Friend", "友人 (Yuujin) - Friend (formal)"]
-    },
-    {
-        char: "女", meaning: "Woman",
-        onyomi: "JO (ジョ)", kunyomi: "onna (おんな)",
-        trick: "A picture of a kneeling **woman**.",
-        compounds: ["女性 (Josei) - Female", "女の子 (Onnanoko) - Girl"]
-    },
-    {
-        char: "男", meaning: "Man",
-        onyomi: "DAN (ダン)", kunyomi: "otoko (おとこ)",
-        trick: "Rice Field (田) + Power (力). The **man** works in the rice field using power.",
-        compounds: ["男性 (Dansei) - Male", "男の子 (Otokonoko) - Boy"]
-    },
-    {
-        char: "子", meaning: "Child",
-        onyomi: "SHI (シ)", kunyomi: "ko (こ)",
-        trick: "A baby wrapped in a blanket with arms sticking out. A **child**.",
-        compounds: ["子供 (Kodomo) - Child", "女子 (Joshi) - Girl/Woman"]
-    },
-    {
-        char: "本", meaning: "Book / Origin",
-        onyomi: "HON (ホン)", kunyomi: "moto (もと)",
-        trick: "Tree (木) with a line at the base (roots). The root is the **origin**. Paper comes from trees = **Book**.",
-        compounds: ["本 (Hon) - Book", "日本 (Nihon) - Japan (Sun Origin)"]
-    },
-    {
-        char: "学", meaning: "Study / Learning",
-        onyomi: "GAKU (ガク)", kunyomi: "mana (まな)",
-        trick: "A child (子) under a school roof being taught by hands from above. Time to **study**.",
-        compounds: ["学生 (Gakusei) - Student", "学校 (Gakkou) - School"]
-    },
-    {
-        char: "校", meaning: "School",
-        onyomi: "KOU (コウ)", kunyomi: "—",
-        trick: "Tree (木) + 交 (Mingle/Mix). A place made of wood where people mingle = **School**.",
-        compounds: ["学校 (Gakkou) - School", "高校 (Koukou) - High School"]
-    },
-    {
-        char: "先", meaning: "Previous / Ahead",
-        onyomi: "SEN (セン)", kunyomi: "saki (さき)",
-        trick: "Human legs running ahead of the earth. Going **ahead**.",
-        compounds: ["先生 (Sensei) - Teacher", "先月 (Sengetsu) - Last month"]
-    },
-    {
-        char: "生", meaning: "Life / Birth",
-        onyomi: "SEI, SHOU (セイ, ショウ)", kunyomi: "i, u, na (い, う, な)",
-        trick: "A plant sprouting from the ground. New **life**.",
-        compounds: ["先生 (Sensei) - Teacher (born before)", "生きる (Ikiru) - To live"]
-    }
-];
-/* --- CHUNK 9: TIME & DIRECTION DATA --- */
-
-const kanjiTimeDir = [
-    {
-        char: "今", meaning: "Now",
-        onyomi: "KON (コン)", kunyomi: "ima (いま)",
-        trick: "A roof with a clock hand under it pointing down. The time is **now**.",
-        compounds: ["今日 (Kyou) - Today", "今月 (Kongetsu) - This month"]
-    },
-    {
-        char: "時", meaning: "Time / Hour",
-        onyomi: "JI (ジ)", kunyomi: "toki (とき)",
-        trick: "Sun (日) + Temple (寺). Before clocks, monks rang the temple bell at sunrise to mark **time**.",
-        compounds: ["時間 (Jikan) - Time", "一時 (Ichiji) - One o'clock"]
-    },
-    {
-        char: "分", meaning: "Minute / Part / Understand",
-        onyomi: "FUN, BUN (フン, ブン)", kunyomi: "wa (わ)",
-        trick: "Eight (八) + Knife (刀). Taking a knife and dividing something into **parts** or minutes.",
-        compounds: ["五分 (Gofun) - 5 minutes", "半分 (Hanbun) - Half"]
-    },
-    {
-        char: "半", meaning: "Half",
-        onyomi: "HAN (ハン)", kunyomi: "naka (なか)",
-        trick: "Three lines cut straight down the middle. Splitting it in **half**.",
-        compounds: ["二時半 (Nijihan) - 2:30", "半年 (Hantoshi) - Half a year"]
-    },
-    {
-        char: "午", meaning: "Noon",
-        onyomi: "GO (ゴ)", kunyomi: "—",
-        trick: "Looks like the number Ten (十) with a slanted roof. The sun is highest at **noon**.",
-        compounds: ["午前 (Gozen) - AM", "午後 (Gogo) - PM"]
-    },
-    {
-        char: "上", meaning: "Up / Above",
-        onyomi: "JOU (ジョウ)", kunyomi: "ue (うえ)",
-        trick: "A pointer pointing **up** above the ground line.",
-        compounds: ["上 (Ue) - Up", "上手 (Jouzu) - Skillful (Upper hand)"]
-    },
-    {
-        char: "下", meaning: "Down / Below",
-        onyomi: "KA, GE (カ, ゲ)", kunyomi: "shita (した)",
-        trick: "A pointer pointing **down** below the ground line.",
-        compounds: ["下 (Shita) - Down", "地下鉄 (Chikatetsu) - Subway"]
-    },
-    {
-        char: "中", meaning: "Middle / Inside",
-        onyomi: "CHUU (チュウ)", kunyomi: "naka (なか)",
-        trick: "A line going straight through the **middle** of a box.",
-        compounds: ["田中 (Tanaka) - Middle of field", "中国 (Chuugoku) - China"]
-    },
-    {
-        char: "北", meaning: "North",
-        onyomi: "HOKU (ホク)", kunyomi: "kita (きた)",
-        trick: "Two people sitting back to back because it's cold in the **North**.",
-        compounds: ["北海道 (Hokkaido) - Hokkaido", "北口 (Kitaguchi) - North exit"]
-    },
-    {
-        char: "南", meaning: "South",
-        onyomi: "NAN (ナン)", kunyomi: "minami (みなみ)",
-        trick: "A tropical plant growing inside a border. Warm **South**.",
-        compounds: ["南口 (Minamiguchi) - South exit", "南 (Minami) - South"]
-    },
-    {
-        char: "東", meaning: "East",
-        onyomi: "TOU (トウ)", kunyomi: "higashi (ひがし)",
-        trick: "Sun (日) rising behind a Tree (木). The sun rises in the **East**.",
-        compounds: ["東京 (Toukyou) - Tokyo", "東口 (Higashiguchi) - East exit"]
-    },
-    {
-        char: "西", meaning: "West",
-        onyomi: "SEI, SAI (セイ, サイ)", kunyomi: "nishi (にし)",
-        trick: "A bird returning to its nest at sunset. The sun sets in the **West**.",
-        compounds: ["関西 (Kansai) - Kansai region", "西口 (Nishiguchi) - West exit"]
-    }
-];
-/* --- CHUNK 10: MERGE & RENDER LOGIC --- */
-
-// Combine ALL data chunks into one Master List
-// Make sure this runs AFTER all the consts above are defined
-const n5MasterList = [
-    ...n5KanjiList,       // From previous turn
-    ...n5KanjiListPart2,  // From previous turn
-    ...kanjiNumbers,      // Chunk 7
-    ...kanjiPeople,       // Chunk 8
-    ...kanjiTimeDir       // Chunk 9
-];
-
-// Update the initial render to use the Master List
-// Replace the old render call with this:
-renderKanji(n5MasterList);
-
-// Update Search Logic to search the Master List
-const searchInputUpdated = document.getElementById('kanjiSearch');
-searchInputUpdated.addEventListener('input', (e) => {
-    const term = e.target.value.toLowerCase();
-    
-    // Search in Meaning, Reading, OR Character
-    const filtered = n5MasterList.filter(k => 
-        k.meaning.toLowerCase().includes(term) || 
-        k.kunyomi.toLowerCase().includes(term) ||
-        k.char.includes(term)
-    );
-    
-    renderKanji(filtered);
-});
-<button onclick="startKanjiQuiz()" style="padding: 10px 20px; background: #ff4757; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">
-    🔥 Start Quiz
-</button>
-
-<div id="quizOverlay" class="kanji-modal-overlay">
-    <div class="kanji-modal" style="text-align: center;">
-        <h3 style="color: #ccc;">What is this Kanji?</h3>
-        <div id="quizChar" style="font-size: 8rem; margin: 20px 0;"></div>
+    <script>
+        /* --- DATASETS --- */
         
-        <div id="quizOptions" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-            </div>
-        <div id="quizResult" style="margin-top:20px; font-weight:bold; height: 30px;"></div>
-        <button onclick="closeQuiz()" style="margin-top: 20px; background: #eee; border: none; padding: 10px; border-radius: 5px; cursor: pointer;">Exit Quiz</button>
-    </div>
-</div>
-/* --- CHUNK 12: QUIZ LOGIC --- */
+        // Basic Nature
+        const n5KanjiList = [
+            { char: "日", meaning: "Day / Sun", onyomi: "NICHI, JITSU", kunyomi: "hi, -bi", trick: "A picture of the **sun**. The rectangle is the shape, and the line is the heat.", compounds: ["日本 (Nihon) - Japan", "日曜日 (Nichiyoubi) - Sunday"] },
+            { char: "月", meaning: "Month / Moon", onyomi: "GETSU, GATSU", kunyomi: "tsuki", trick: "A **crescent moon** with two clouds floating in front.", compounds: ["月曜日 (Getsuyoubi) - Monday", "一月 (Ichigatsu) - January"] },
+            { char: "木", meaning: "Tree", onyomi: "MOKU", kunyomi: "ki", trick: "Looks exactly like a **tree**. Trunk, branches, and roots.", compounds: ["木曜日 (Mokuyoubi) - Thursday", "木 (Ki) - Tree"] },
+            { char: "山", meaning: "Mountain", onyomi: "SAN", kunyomi: "yama", trick: "A pictogram of a **mountain** with three peaks.", compounds: ["富士山 (Fujisan) - Mt. Fuji", "山 (Yama) - Mountain"] },
+            { char: "川", meaning: "River", onyomi: "SEN", kunyomi: "kawa", trick: "Three lines flowing vertically like a **river**.", compounds: ["川 (Kawa) - River", "小川 (Ogawa) - Stream"] },
+            { char: "田", meaning: "Rice Field", onyomi: "DEN", kunyomi: "ta", trick: "Bird's eye view of a **rice paddy** divided into four sections.", compounds: ["水田 (Suiden) - Paddy field", "田中 (Tanaka) - Surname"] }
+        ];
 
-function startKanjiQuiz() {
-    const overlay = document.getElementById('quizOverlay');
-    overlay.style.display = 'flex';
-    nextQuizQuestion();
-}
+        // Objects & Elements
+        const n5KanjiListPart2 = [
+            { char: "人", meaning: "Person", onyomi: "JIN, NIN", kunyomi: "hito", trick: "Side view of a **person** walking.", compounds: ["日本人 (Nihonjin) - Japanese person", "三人 (Sannin) - 3 people"] },
+            { char: "口", meaning: "Mouth", onyomi: "KOU", kunyomi: "kuchi", trick: "A wide open **mouth**. Just a square opening.", compounds: ["入口 (Iriguchi) - Entrance", "人口 (Jinkou) - Population"] },
+            { char: "車", meaning: "Car", onyomi: "SHA", kunyomi: "kuruma", trick: "Top view of a cart. Two wheels and an axle.", compounds: ["電車 (Densha) - Train", "車 (Kuruma) - Car"] },
+            { char: "門", meaning: "Gate", onyomi: "MON", kunyomi: "kado", trick: "Looks like a pair of swinging saloon **gates**.", compounds: ["専門 (Senmon) - Major", "門 (Mon) - Gate"] },
+            { char: "火", meaning: "Fire", onyomi: "KA", kunyomi: "hi", trick: "A person waving arms in panic because they are on **fire**.", compounds: ["火曜日 (Kayoubi) - Tuesday", "花火 (Hanabi) - Fireworks"] },
+            { char: "水", meaning: "Water", onyomi: "SUI", kunyomi: "mizu", trick: "Water splashing out of a central stream fountain.", compounds: ["水曜日 (Suiyoubi) - Wednesday", "水 (Mizu) - Water"] }
+        ];
 
-function nextQuizQuestion() {
-    const resultDiv = document.getElementById('quizResult');
-    resultDiv.innerText = "";
-    
-    // Pick random Kanji
-    const correctKanji = n5MasterList[Math.floor(Math.random() * n5MasterList.length)];
-    
-    document.getElementById('quizChar').innerText = correctKanji.char;
-    
-    // Generate 3 wrong answers
-    const options = [correctKanji];
-    while(options.length < 4) {
-        const random = n5MasterList[Math.floor(Math.random() * n5MasterList.length)];
-        if (!options.includes(random)) options.push(random);
-    }
-    
-    // Shuffle options
-    options.sort(() => Math.random() - 0.5);
-    
-    const optionsContainer = document.getElementById('quizOptions');
-    optionsContainer.innerHTML = '';
-    
-    options.forEach(opt => {
-        const btn = document.createElement('button');
-        btn.innerText = opt.meaning;
-        btn.style.padding = "15px";
-        btn.style.fontSize = "1.2rem";
-        btn.style.cursor = "pointer";
-        btn.style.border = "1px solid #ddd";
-        btn.style.borderRadius = "8px";
-        btn.style.background = "white";
-        
-        btn.onclick = () => {
-            if(opt === correctKanji) {
-                btn.style.background = "#2ecc71";
-                btn.style.color = "white";
-                resultDiv.innerText = "Correct! Next...";
-                resultDiv.style.color = "#2ecc71";
-                setTimeout(nextQuizQuestion, 1000);
-            } else {
-                btn.style.background = "#ff6b6b";
-                btn.style.color = "white";
-                resultDiv.innerText = "Try Again!";
-                resultDiv.style.color = "#ff6b6b";
+        // Numbers
+        const kanjiNumbers = [
+            { char: "一", meaning: "One", onyomi: "ICHI", kunyomi: "hito", trick: "One finger holding up **one**.", compounds: ["一日 (Tsuitachi) - 1st day"] },
+            { char: "二", meaning: "Two", onyomi: "NI", kunyomi: "futa", trick: "Two lines is **two**.", compounds: ["二月 (Nigatsu) - Feb"] },
+            { char: "三", meaning: "Three", onyomi: "SAN", kunyomi: "mi", trick: "Three lines is **three**.", compounds: ["三月 (Sangatsu) - March"] },
+            { char: "四", meaning: "Four", onyomi: "SHI", kunyomi: "yon", trick: "A window with curtains. 4 corners = **four**.", compounds: ["四月 (Shigatsu) - April"] },
+            { char: "五", meaning: "Five", onyomi: "GO", kunyomi: "itsu", trick: "Connect the dots of the number 5.", compounds: ["五月 (Gogatsu) - May"] },
+            { char: "六", meaning: "Six", onyomi: "ROKU", kunyomi: "mu", trick: "Person doing jumping jacks. **Six** reps.", compounds: ["六月 (Rokugatsu) - June"] },
+            { char: "七", meaning: "Seven", onyomi: "SHICHI", kunyomi: "nana", trick: "Number **7** turned upside down.", compounds: ["七月 (Shichigatsu) - July"] },
+            { char: "八", meaning: "Eight", onyomi: "HACHI", kunyomi: "ya", trick: "Mt Fuji shape. Lucky number **8**.", compounds: ["八月 (Hachigatsu) - August"] },
+            { char: "九", meaning: "Nine", onyomi: "KYUU", kunyomi: "kokono", trick: "Person trying to do **nine** pushups.", compounds: ["九月 (Kugatsu) - Sept"] },
+            { char: "十", meaning: "Ten", onyomi: "JUU", kunyomi: "tou", trick: "A plus sign. Two fives cross to make **ten**.", compounds: ["十月 (Juugatsu) - Oct"] },
+            { char: "百", meaning: "Hundred", onyomi: "HYAKU", kunyomi: "momo", trick: "One (一) white (白) flag represents **100** soldiers.", compounds: ["三百 (Sanbyaku) - 300"] },
+            { char: "千", meaning: "Thousand", onyomi: "SEN", kunyomi: "chi", trick: "Ten (十) with a slash. A big jump to **1000**.", compounds: ["千円 (Senyen) - 1000 yen"] },
+            { char: "万", meaning: "10,000", onyomi: "MAN", kunyomi: "-", trick: "Like Five (五) but simpler. **10,000**.", compounds: ["一万円 (Ichimanen) - 10,000 yen"] },
+            { char: "円", meaning: "Yen / Circle", onyomi: "EN", kunyomi: "maru", trick: "A bank teller window where you get **Yen**.", compounds: ["百円 (Hyakuen) - 100 yen"] }
+        ];
+
+        // People
+        const kanjiPeople = [
+            { char: "父", meaning: "Father", onyomi: "FU", kunyomi: "chichi", trick: "Axes crossed above a face. **Father** protects.", compounds: ["お父さん (Otousan) - Dad"] },
+            { char: "母", meaning: "Mother", onyomi: "BO", kunyomi: "haha", trick: "Outline of a nursing **mother**.", compounds: ["お母さん (Okaasan) - Mom"] },
+            { char: "友", meaning: "Friend", onyomi: "YUU", kunyomi: "tomo", trick: "Two hands holding. **Friendship**.", compounds: ["友達 (Tomodachi) - Friend"] },
+            { char: "女", meaning: "Woman", onyomi: "JO", kunyomi: "onna", trick: "Kneeling **woman**.", compounds: ["女性 (Josei) - Female"] },
+            { char: "男", meaning: "Man", onyomi: "DAN", kunyomi: "otoko", trick: "Field (田) + Power (力). A **man** working the field.", compounds: ["男性 (Dansei) - Male"] },
+            { char: "子", meaning: "Child", onyomi: "SHI", kunyomi: "ko", trick: "Baby wrapped in blanket. **Child**.", compounds: ["子供 (Kodomo) - Child"] },
+            { char: "本", meaning: "Book / Origin", onyomi: "HON", kunyomi: "moto", trick: "Tree (木) marked at roots (origin). Paper = **Book**.", compounds: ["日本 (Nihon) - Japan"] },
+            { char: "学", meaning: "Study", onyomi: "GAKU", kunyomi: "mana", trick: "Child under roof being taught. **Study**.", compounds: ["学生 (Gakusei) - Student"] },
+            { char: "校", meaning: "School", onyomi: "KOU", kunyomi: "-", trick: "Tree + Mingle. Wooden place where people mix = **School**.", compounds: ["学校 (Gakkou) - School"] },
+            { char: "先", meaning: "Previous", onyomi: "SEN", kunyomi: "saki", trick: "Legs running ahead. **Previous/Ahead**.", compounds: ["先生 (Sensei) - Teacher"] },
+            { char: "生", meaning: "Life", onyomi: "SEI", kunyomi: "i", trick: "Plant sprouting. New **life**.", compounds: ["生きる (Ikiru) - To live"] }
+        ];
+
+        // Time & Direction
+        const kanjiTimeDir = [
+            { char: "今", meaning: "Now", onyomi: "KON", kunyomi: "ima", trick: "Roof with clock hand pointing down. Time is **now**.", compounds: ["今日 (Kyou) - Today"] },
+            { char: "時", meaning: "Time", onyomi: "JI", kunyomi: "toki", trick: "Sun + Temple. Monks ringing bells to mark **time**.", compounds: ["時間 (Jikan) - Time"] },
+            { char: "分", meaning: "Minute/Part", onyomi: "FUN", kunyomi: "wa", trick: "Knife dividing something into **parts**.", compounds: ["五分 (Gofun) - 5 mins"] },
+            { char: "半", meaning: "Half", onyomi: "HAN", kunyomi: "naka", trick: "Lines cut straight down middle. **Half**.", compounds: ["半分 (Hanbun) - Half"] },
+            { char: "午", meaning: "Noon", onyomi: "GO", kunyomi: "-", trick: "Ten with slanted roof. Sun high at **noon**.", compounds: ["午前 (Gozen) - AM"] },
+            { char: "上", meaning: "Up", onyomi: "JOU", kunyomi: "ue", trick: "Pointer pointing **up** above line.", compounds: ["上 (Ue) - Up"] },
+            { char: "下", meaning: "Down", onyomi: "KA", kunyomi: "shita", trick: "Pointer pointing **down** below line.", compounds: ["下 (Shita) - Down"] },
+            { char: "中", meaning: "Middle", onyomi: "CHUU", kunyomi: "naka", trick: "Line through **middle** of box.", compounds: ["田中 (Tanaka) - Surname"] },
+            { char: "北", meaning: "North", onyomi: "HOKU", kunyomi: "kita", trick: "Two people back to back because it's cold in **North**.", compounds: ["北海道 (Hokkaido)"] },
+            { char: "南", meaning: "South", onyomi: "NAN", kunyomi: "minami", trick: "Tropical plant in border. Warm **South**.", compounds: ["南 (Minami) - South"] },
+            { char: "東", meaning: "East", onyomi: "TOU", kunyomi: "higashi", trick: "Sun rising behind tree. **East**.", compounds: ["東京 (Tokyo)"] },
+            { char: "西", meaning: "West", onyomi: "SEI", kunyomi: "nishi", trick: "Bird returning to nest at sunset. **West**.", compounds: ["関西 (Kansai)"] }
+        ];
+
+        // --- MASTER LIST MERGE ---
+        const n5MasterList = [
+            ...n5KanjiList,
+            ...n5KanjiListPart2,
+            ...kanjiNumbers,
+            ...kanjiPeople,
+            ...kanjiTimeDir
+        ];
+
+        /* --- DOM ELEMENTS --- */
+        const kanjiGrid = document.getElementById('kanjiGrid');
+        const searchInput = document.getElementById('kanjiSearch');
+        const modalOverlay = document.getElementById('kanjiModalOverlay');
+
+        /* --- RENDER FUNCTION --- */
+        function renderKanji(data) {
+            kanjiGrid.innerHTML = ''; // Clear grid
+
+            if (data.length === 0) {
+                kanjiGrid.innerHTML = '<div style="grid-column: 1/-1; text-align:center; color:#999;">No Kanji found... try "Sun" or "Tree"</div>';
+                return;
             }
-        };
-        optionsContainer.appendChild(btn);
-    });
-}
 
-function closeQuiz() {
-    document.getElementById('quizOverlay').style.display = 'none';
-}
+            data.forEach((k) => {
+                const card = document.createElement('div');
+                card.className = 'kanji-card';
+                card.onclick = () => openKanjiModal(k);
+
+                card.innerHTML = `
+                    <div class="kanji-char">${k.char}</div>
+                    <div class="kanji-meaning">${k.meaning}</div>
+                `;
+                kanjiGrid.appendChild(card);
+            });
+        }
+
+        /* --- SEARCH LOGIC (FIXED) --- */
+        searchInput.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            
+            const filtered = n5MasterList.filter(k => 
+                k.meaning.toLowerCase().includes(term) || 
+                k.kunyomi.toLowerCase().includes(term) ||
+                k.char.includes(term)
+            );
+            
+            renderKanji(filtered);
+        });
+
+        /* --- MODAL LOGIC --- */
+        function openKanjiModal(kanjiData) {
+            document.getElementById('modalKanjiChar').innerText = kanjiData.char;
+            document.getElementById('modalKanjiMeaning').innerText = kanjiData.meaning;
+            document.getElementById('modalMemoryTrick').innerHTML = kanjiData.trick; // InnerHTML for bold tags
+            document.getElementById('modalOnyomi').innerText = kanjiData.onyomi;
+            document.getElementById('modalKunyomi').innerText = kanjiData.kunyomi;
+
+            const compoundsList = document.getElementById('modalCompounds');
+            compoundsList.innerHTML = ''; 
+            kanjiData.compounds.forEach(comp => {
+                const li = document.createElement('li');
+                li.style.padding = "4px 0";
+                li.style.borderBottom = "1px dashed #eee";
+                li.innerText = comp;
+                compoundsList.appendChild(li);
+            });
+
+            modalOverlay.style.display = 'flex';
+        }
+
+        function closeKanjiModal() {
+            modalOverlay.style.display = 'none';
+        }
+
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) closeKanjiModal();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === "Escape") {
+                closeKanjiModal();
+                closeQuiz();
+            }
+        });
+
+        /* --- QUIZ LOGIC --- */
+        function startKanjiQuiz() {
+            document.getElementById('quizOverlay').style.display = 'flex';
+            nextQuizQuestion();
+        }
+
+        function closeQuiz() {
+            document.getElementById('quizOverlay').style.display = 'none';
+        }
+
+        function nextQuizQuestion() {
+            const resultDiv = document.getElementById('quizResult');
+            resultDiv.innerText = "";
+            
+            // Random Kanji
+            const correctKanji = n5MasterList[Math.floor(Math.random() * n5MasterList.length)];
+            document.getElementById('quizChar').innerText = correctKanji.char;
+            
+            // 3 Wrong Answers
+            const options = [correctKanji];
+            while(options.length < 4) {
+                const random = n5MasterList[Math.floor(Math.random() * n5MasterList.length)];
+                if (!options.includes(random)) options.push(random);
+            }
+            
+            // Shuffle
+            options.sort(() => Math.random() - 0.5);
+            
+            const optionsContainer = document.getElementById('quizOptions');
+            optionsContainer.innerHTML = '';
+            
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'quiz-option-btn';
+                btn.innerText = opt.meaning;
+                
+                btn.onclick = () => {
+                    if(opt === correctKanji) {
+                        btn.style.background = "#2ecc71";
+                        btn.style.color = "white";
+                        btn.style.borderColor = "#27ae60";
+                        resultDiv.innerText = "Correct! Next...";
+                        resultDiv.style.color = "#2ecc71";
+                        setTimeout(nextQuizQuestion, 1000);
+                    } else {
+                        btn.style.background = "#ff6b6b";
+                        btn.style.color = "white";
+                        btn.style.borderColor = "#ee5253";
+                        resultDiv.innerText = "Try Again!";
+                        resultDiv.style.color = "#ff6b6b";
+                    }
+                };
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        // --- INITIALIZE ---
+        renderKanji(n5MasterList);
+
+    </script>
+</body>
+</html>
