@@ -3,31 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nihongo Pro | Ultimate Edition</title>
+    <title>Nihongo Pro | Ultimate Grand Library</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;600;700&family=Zen+Maru+Gothic:wght@400;700&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;600;700;800&family=Zen+Maru+Gothic:wght@400;500;700&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        body { font-family: 'Quicksand', sans-serif; overflow: hidden; }
+        /* BASE SETTINGS */
+        body { 
+            font-family: 'Quicksand', sans-serif; 
+            overflow: hidden; 
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+        }
         .jp { font-family: 'Zen Maru Gothic', sans-serif; }
         .kanji-font { font-family: 'Noto Sans JP', sans-serif; }
         
         /* SAKURA ANIMATION */
         .sakura-container { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            pointer-events: none; z-index: 50; overflow: hidden; 
+            pointer-events: none; z-index: 0; overflow: hidden; 
         }
         .petal {
             position: absolute; background-color: #ffc0cb; border-radius: 100% 0% 100% 0%;
-            opacity: 0.8; animation: fall linear infinite; box-shadow: 0 0 5px rgba(255, 192, 203, 0.5);
+            opacity: 0.8; animation: fall linear infinite; 
+            box-shadow: 0 0 5px rgba(255, 192, 203, 0.5);
         }
         @keyframes fall {
             0% { transform: translate(0, -10vh) rotate(0deg); opacity: 0; }
@@ -35,40 +39,56 @@
             100% { transform: translate(100px, 110vh) rotate(360deg); opacity: 0; }
         }
 
-        /* UI ANIMATIONS */
-        .fade-in { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
-        .slide-up { animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
-        .pop-in { animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        
+        /* ANIMATIONS */
+        .fade-in { animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+        .slide-up { animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+        .pop-in { animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .hover-lift { transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .hover-lift:hover { transform: translateY(-4px); }
+
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         
-        /* GLASS EFFECTS */
+        /* GLASSMORPHISM */
         .glass-panel {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            position: relative; z-index: 10;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
         }
         
-        /* Custom Scrollbar hide */
+        /* UTILITIES */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* GRID PATTERN OVERLAY */
+        .bg-grid {
+            background-size: 40px 40px;
+            background-image: radial-gradient(circle, #e0e0e0 1px, transparent 1px);
+            opacity: 0.5;
+            position: absolute; inset: 0; z-index: -1;
+        }
     </style>
 </head>
-<body class="bg-gradient-to-br from-pink-50 via-white to-blue-50 h-[100dvh] w-screen relative text-slate-700">
-
+<body class="text-slate-700 h-screen w-screen relative selection:bg-pink-200 selection:text-pink-900">
+    
+    <div class="bg-grid"></div>
     <div id="root" class="h-full w-full relative z-10"></div>
 
     <script type="text/babel">
         const { useState, useEffect, useMemo } = React;
 
-        // --- SAKURA COMPONENT ---
+        // --- COMPONENT: SAKURA BACKGROUND ---
         const SakuraBackground = () => {
-            const petals = useMemo(() => [...Array(30)].map((_, i) => ({
-                id: i, left: Math.random() * 100 + "%", width: Math.random() * 15 + 10 + "px",
-                height: Math.random() * 15 + 10 + "px", animationDuration: Math.random() * 5 + 8 + "s",
+            const petals = useMemo(() => [...Array(25)].map((_, i) => ({
+                id: i, left: Math.random() * 100 + "%", width: Math.random() * 12 + 8 + "px",
+                height: Math.random() * 12 + 8 + "px", animationDuration: Math.random() * 5 + 10 + "s",
                 animationDelay: Math.random() * 5 + "s"
             })), []);
             return (
@@ -82,45 +102,132 @@
                 </div>
             );
         };
+        /* --- PART 2: THE DATA ENGINE --- */
 
-        // --- KANJI LIBRARY ---
+        // 1. KANJI LIBRARY (100+ Characters)
         const KANJI_LIB = {
-            "私": { mean: "I, Me", onyomi: "SHI", kunyomi: "watashi", trick: "A nose pointing to oneself (privacy). Or wheat (crops) being private property." },
-            "学生": { mean: "Student", onyomi: "GAKU-SEI", kunyomi: "—", trick: "Combine 'Study' (School roof + child) and 'Life' (Sprout)." },
-            "これ": { mean: "This", onyomi: "—", kunyomi: "kore", trick: "Hiragana only usually, but imagine pointing HERE." },
-            "それ": { mean: "That", onyomi: "—", kunyomi: "sore", trick: "Hiragana only usually." },
-            "ここ": { mean: "Here", onyomi: "—", kunyomi: "koko", trick: "Hiragana." },
-            "今": { mean: "Now", onyomi: "KON", kunyomi: "ima", trick: "A roof with a clock hand pointing straight down. The time is NOW." },
-            "行きます": { mean: "To go", onyomi: "KOU", kunyomi: "i-kimasu", trick: "Step forward with the left foot, then the right." },
-            "食べます": { mean: "To eat", onyomi: "SHOKU", kunyomi: "ta-bemasu", trick: "Person + Good. It is good for people to eat." },
-            "手": { mean: "Hand", onyomi: "SHU", kunyomi: "te", trick: "Lines on the palm of a hand." },
-            "高い": { mean: "High/Expensive", onyomi: "KOU", kunyomi: "taka-i", trick: "A tall towerhouse with a roof and windows." },
-            "好き": { mean: "Like", onyomi: "KOU", kunyomi: "su-ki", trick: "Woman + Child. A mother likes her child." },
-            "います": { mean: "Exist (Living)", onyomi: "—", kunyomi: "i-masu", trick: "Hiragana usually." },
-            "一つ": { mean: "One thing", onyomi: "ICHI", kunyomi: "hito-tsu", trick: "One finger." },
-            "寒い": { mean: "Cold", onyomi: "KAN", kunyomi: "samu-i", trick: "Person inside a house shivering under straw bedding." },
-            "欲しい": { mean: "Want", onyomi: "YOKU", kunyomi: "ho-shii", trick: "Valley + Lack. A deep desire." },
-            "待って": { mean: "Wait", onyomi: "TAI", kunyomi: "ma-tte", trick: "Go + Temple. Waiting at the temple." },
-            "置きます": { mean: "Put/Place", onyomi: "CHI", kunyomi: "o-kimasu", trick: "Net + Upright. Placing a net upright." },
-            "乗ります": { mean: "Ride", onyomi: "JOU", kunyomi: "no-rimasu", trick: "Tree + Person on top." },
-            "心配": { mean: "Worry", onyomi: "SHIN-PAI", kunyomi: "—", trick: "Heart + Distribute. Distributing your heart in many directions = Worry." },
-            "運転": { mean: "Drive", onyomi: "UN-TEN", kunyomi: "—", trick: "Car + Move." },
-            "登ります": { mean: "Climb", onyomi: "TOU", kunyomi: "nobo-rimasu", trick: "Feet stepping up onto a pedestal." },
-            "要ります": { mean: "Need", onyomi: "YOU", kunyomi: "i-rimasu", trick: "West + Woman. Essential needs." },
-            "思います": { mean: "Think", onyomi: "SHI", kunyomi: "omo-imasu", trick: "Field + Heart. Thinking deeply." },
-            "着ます": { mean: "Wear", onyomi: "CHAKU", kunyomi: "ki-masu", trick: "Wool + Eye. Looking at clothes." },
-            "回します": { mean: "Turn", onyomi: "KAI", kunyomi: "mawa-shimasu", trick: "A smaller square inside a larger square. Rotating." },
-            "くれます": { mean: "Give (to me)", onyomi: "—", kunyomi: "ku-remasu", trick: "Hiragana." },
-            "考えます": { mean: "Think/Consider", onyomi: "KOU", kunyomi: "kanga-emasu", trick: "Old man thinking." },
-            "日": { mean: "Sun/Day", onyomi: "NICHI", kunyomi: "hi", trick: "The sun with a sunspot in the middle." },
-            "月": { mean: "Moon/Month", onyomi: "GETSU", kunyomi: "tsuki", trick: "Crescent moon with clouds." },
+            // Numbers
+            "一": { mean: "One", onyomi: "ICHI", kunyomi: "hito", trick: "One finger holding up the number one." },
+            "二": { mean: "Two", onyomi: "NI", kunyomi: "futa", trick: "Two lines represent the number two." },
+            "三": { mean: "Three", onyomi: "SAN", kunyomi: "mit", trick: "Three lines for the number three." },
+            "四": { mean: "Four", onyomi: "SHI", kunyomi: "yon", trick: "A window with curtains. 4 corners." },
+            "五": { mean: "Five", onyomi: "GO", kunyomi: "itsu", trick: "Connect the dots of the number 5." },
+            "六": { mean: "Six", onyomi: "ROKU", kunyomi: "mut", trick: "Person doing jumping jacks. 6 reps!" },
+            "七": { mean: "Seven", onyomi: "SHICHI", kunyomi: "nana", trick: "Number 7 turned upside down." },
+            "八": { mean: "Eight", onyomi: "HACHI", kunyomi: "yat", trick: "A volcano shape. Lucky number 8." },
+            "九": { mean: "Nine", onyomi: "KYUU", kunyomi: "kokono", trick: "Person doing a pushup (9 times)." },
+            "十": { mean: "Ten", onyomi: "JUU", kunyomi: "tou", trick: "A plus sign. Two fives crossed." },
+            "百": { mean: "Hundred", onyomi: "HYAKU", kunyomi: "—", trick: "One (一) white (白) flag = 100 troops." },
+            "千": { mean: "Thousand", onyomi: "SEN", kunyomi: "chi", trick: "Ten (十) with a slash. A big jump to 1000." },
+            "万": { mean: "10,000", onyomi: "MAN", kunyomi: "—", trick: "Like Five (五) but simpler. 10,000." },
+            "円": { mean: "Yen / Circle", onyomi: "EN", kunyomi: "maru", trick: "A bank teller window." },
+            
+            // Time & Calendar
+            "日": { mean: "Sun / Day", onyomi: "NICHI", kunyomi: "hi", trick: "The sun with a sunspot in the middle." },
+            "月": { mean: "Moon / Month", onyomi: "GETSU", kunyomi: "tsuki", trick: "Crescent moon with clouds." },
+            "火": { mean: "Fire", onyomi: "KA", kunyomi: "hi", trick: "Person waving arms in panic (on fire)." },
+            "水": { mean: "Water", onyomi: "SUI", kunyomi: "mizu", trick: "Water splashing from a fountain." },
             "木": { mean: "Tree", onyomi: "MOKU", kunyomi: "ki", trick: "A tree with roots and branches." },
+            "金": { mean: "Gold / Money", onyomi: "KIN", kunyomi: "kane", trick: "People finding gold nuggets under a mountain." },
+            "土": { mean: "Soil / Earth", onyomi: "DO", kunyomi: "tsuchi", trick: "A sprout growing from the ground." },
+            "年": { mean: "Year", onyomi: "NEN", kunyomi: "toshi", trick: "Harvesting rice. Happens once a year." },
+            "時": { mean: "Time", onyomi: "JI", kunyomi: "toki", trick: "Sun + Temple. Bell ringing at sunrise." },
+            "間": { mean: "Interval", onyomi: "KAN", kunyomi: "aida", trick: "Sun inside a Gate. Sunlight peering through." },
+            "週": { mean: "Week", onyomi: "SHUU", kunyomi: "—", trick: "Road + Cycle. A 7-day cycle." },
+            "今": { mean: "Now", onyomi: "KON", kunyomi: "ima", trick: "Roof + Clock hand pointing down." },
+            "先": { mean: "Previous", onyomi: "SEN", kunyomi: "saki", trick: "Legs running ahead/before." },
+            "毎": { mean: "Every", onyomi: "MAI", kunyomi: "—", trick: "Person + Mother. Every person has a mother." },
+            "午": { mean: "Noon", onyomi: "GO", kunyomi: "—", trick: "Ten with a slanted roof. Sun high at noon." },
+            "半": { mean: "Half", onyomi: "HAN", kunyomi: "naka", trick: "Three lines cut down the middle." },
+
+            // Nature & Elements
             "山": { mean: "Mountain", onyomi: "SAN", kunyomi: "yama", trick: "Three peaks of a mountain." },
             "川": { mean: "River", onyomi: "SEN", kunyomi: "kawa", trick: "Flowing water lines." },
-            "田": { mean: "Rice Field", onyomi: "DEN", kunyomi: "ta", trick: "A field divided into four sections." }
-        };
+            "田": { mean: "Rice Field", onyomi: "DEN", kunyomi: "ta", trick: "Field divided into four sections." },
+            "天": { mean: "Heaven", onyomi: "TEN", kunyomi: "ama", trick: "One big place above humans." },
+            "空": { mean: "Sky", onyomi: "KUU", kunyomi: "sora", trick: "Roof + Craft. Empty space under roof." },
+            "雨": { mean: "Rain", onyomi: "U", kunyomi: "ame", trick: "Water drops falling from clouds." },
+            "電": { mean: "Electricity", onyomi: "DEN", kunyomi: "—", trick: "Rain + Dragon tail (Lightning)." },
+            "気": { mean: "Spirit/Air", onyomi: "KI", kunyomi: "—", trick: "Steam rising from rice (energy)." },
+            "花": { mean: "Flower", onyomi: "KA", kunyomi: "hana", trick: "Grass + Change. Plants changing to beauty." },
 
-        // --- DATABASE ENGINE ---
+            // People & Body
+            "人": { mean: "Person", onyomi: "JIN", kunyomi: "hito", trick: "Side view of a person walking." },
+            "男": { mean: "Man", onyomi: "DAN", kunyomi: "otoko", trick: "Rice field + Power." },
+            "女": { mean: "Woman", onyomi: "JO", kunyomi: "onna", trick: "A kneeling woman." },
+            "子": { mean: "Child", onyomi: "SHI", kunyomi: "ko", trick: "Baby in a blanket." },
+            "父": { mean: "Father", onyomi: "FU", kunyomi: "chichi", trick: "Axes crossed. Father protects." },
+            "母": { mean: "Mother", onyomi: "BO", kunyomi: "haha", trick: "Outline of a nursing mother." },
+            "友": { mean: "Friend", onyomi: "YUU", kunyomi: "tomo", trick: "Two hands holding. Friendship." },
+            "私": { mean: "I / Me", onyomi: "SHI", kunyomi: "watashi", trick: "Guarding my wheat (private)." },
+            "目": { mean: "Eye", onyomi: "MOKU", kunyomi: "me", trick: "Eye turned sideways." },
+            "口": { mean: "Mouth", onyomi: "KOU", kunyomi: "kuchi", trick: "A square opening." },
+            "耳": { mean: "Ear", onyomi: "JI", kunyomi: "mimi", trick: "Outline of an ear." },
+            "手": { mean: "Hand", onyomi: "SHU", kunyomi: "te", trick: "Lines on a palm." },
+            "足": { mean: "Foot", onyomi: "SOKU", kunyomi: "ashi", trick: "Mouth + Person standing." },
+            
+            // Directions
+            "上": { mean: "Up", onyomi: "JOU", kunyomi: "ue", trick: "Pointer pointing UP." },
+            "下": { mean: "Down", onyomi: "KA", kunyomi: "shita", trick: "Pointer pointing DOWN." },
+            "左": { mean: "Left", onyomi: "SA", kunyomi: "hidari", trick: "Hand + Work (工)." },
+            "右": { mean: "Right", onyomi: "U", kunyomi: "migi", trick: "Hand + Mouth (口)." },
+            "中": { mean: "Middle", onyomi: "CHUU", kunyomi: "naka", trick: "Line through a box." },
+            "外": { mean: "Outside", onyomi: "GAI", kunyomi: "soto", trick: "Evening + To. Go out at night." },
+            "北": { mean: "North", onyomi: "HOKU", kunyomi: "kita", trick: "Two people back to back (cold)." },
+            "南": { mean: "South", onyomi: "NAN", kunyomi: "minami", trick: "Plant in a border (warm)." },
+            "東": { mean: "East", onyomi: "TOU", kunyomi: "higashi", trick: "Sun rising behind a tree." },
+            "西": { mean: "West", onyomi: "SEI", kunyomi: "nishi", trick: "Bird in nest at sunset." },
+            "前": { mean: "Front", onyomi: "ZEN", kunyomi: "mae", trick: "Cutting nails before moonrise." },
+            "後": { mean: "Behind", onyomi: "GO", kunyomi: "ato", trick: "Walking slowly after hatching." },
+
+            // Verbs
+            "行": { mean: "To Go", onyomi: "KOU", kunyomi: "i-ku", trick: "Step left, step right." },
+            "来": { mean: "To Come", onyomi: "RAI", kunyomi: "ku-ru", trick: "Tree + Rice. Come for harvest." },
+            "帰": { mean: "To Return", onyomi: "KI", kunyomi: "kae-ru", trick: "Broom + Apron. Return to clean." },
+            "食": { mean: "To Eat", onyomi: "SHOKU", kunyomi: "ta-beru", trick: "Person + Good. Good to eat." },
+            "飲": { mean: "To Drink", onyomi: "IN", kunyomi: "no-mu", trick: "Eat + Yawn. Mouth open." },
+            "見": { mean: "To See", onyomi: "KEN", kunyomi: "mi-ru", trick: "Eye on legs." },
+            "聞": { mean: "To Listen", onyomi: "BUN", kunyomi: "ki-ku", trick: "Ear at the Gate." },
+            "読": { mean: "To Read", onyomi: "DOKU", kunyomi: "yo-mu", trick: "Words + Sell. Sales pitch." },
+            "書": { mean: "To Write", onyomi: "SHO", kunyomi: "ka-ku", trick: "Brush in hand + Sun." },
+            "話": { mean: "To Speak", onyomi: "WA", kunyomi: "hana-su", trick: "Words + Tongue." },
+            "買": { mean: "To Buy", onyomi: "BAI", kunyomi: "ka-u", trick: "Net + Money (Shell)." },
+            "休": { mean: "To Rest", onyomi: "KYUU", kunyomi: "yasu-mu", trick: "Person leaning on Tree." },
+            "立": { mean: "To Stand", onyomi: "RITSU", kunyomi: "ta-tsu", trick: "Person standing firm." },
+            "出": { mean: "To Exit", onyomi: "SHUTSU", kunyomi: "de-ru", trick: "Two mountains stacked." },
+            "入": { mean: "To Enter", onyomi: "NYUU", kunyomi: "hai-ru", trick: "Person ducking to enter." },
+            "会": { mean: "To Meet", onyomi: "KAI", kunyomi: "a-u", trick: "Under a roof, two lines meet." },
+            "言": { mean: "To Say", onyomi: "GEN", kunyomi: "i-u", trick: "Mouth projecting sound waves." },
+            
+            // Adjectives
+            "大": { mean: "Big", onyomi: "DAI", kunyomi: "oo-kii", trick: "Person arms stretched wide." },
+            "小": { mean: "Small", onyomi: "SHOU", kunyomi: "chii-sai", trick: "Hook with small grains." },
+            "新": { mean: "New", onyomi: "SHIN", kunyomi: "atara-shii", trick: "Axe cutting tree for new stand." },
+            "古": { mean: "Old", onyomi: "KO", kunyomi: "furu-i", trick: "Tombstone + Mouth. Old story." },
+            "高": { mean: "High", onyomi: "KOU", kunyomi: "taka-i", trick: "Tall towerhouse." },
+            "安": { mean: "Cheap/Safe", onyomi: "AN", kunyomi: "yasu-i", trick: "Woman under roof (Safe)." },
+            "多": { mean: "Many", onyomi: "TA", kunyomi: "oo-i", trick: "Two moons. Many nights." },
+            "少": { mean: "Few", onyomi: "SHOU", kunyomi: "suku-nai", trick: "Small with a slice missing." },
+            "長": { mean: "Long", onyomi: "CHOU", kunyomi: "naga-i", trick: "Long flowing hair." },
+            "白": { mean: "White", onyomi: "HAKU", kunyomi: "shiro", trick: "Sun with a white ray." },
+            "黒": { mean: "Black", onyomi: "KOKU", kunyomi: "kuro", trick: "Field + Fire (Burnt)." },
+            "赤": { mean: "Red", onyomi: "SEKI", kunyomi: "aka", trick: "Earth + Fire (Lava)." },
+            "青": { mean: "Blue", onyomi: "SEI", kunyomi: "ao", trick: "Life under the Moon (Ocean)." },
+
+            // School & Society
+            "学": { mean: "Study", onyomi: "GAKU", kunyomi: "mana-bu", trick: "Child under school roof." },
+            "校": { mean: "School", onyomi: "KOU", kunyomi: "—", trick: "Tree + Mingle. Wooden building." },
+            "本": { mean: "Book", onyomi: "HON", kunyomi: "moto", trick: "Tree with root line (Origin)." },
+            "名": { mean: "Name", onyomi: "MEI", kunyomi: "na", trick: "Mouth in evening. Say name." },
+            "国": { mean: "Country", onyomi: "KOKU", kunyomi: "kuni", trick: "Jewel inside a box." },
+            "語": { mean: "Language", onyomi: "GO", kunyomi: "kata-ru", trick: "5 mouths speaking words." },
+            "車": { mean: "Car", onyomi: "SHA", kunyomi: "kuruma", trick: "Cart from above." },
+            "門": { mean: "Gate", onyomi: "MON", kunyomi: "kado", trick: "Saloon doors." },
+            "駅": { mean: "Station", onyomi: "EKI", kunyomi: "—", trick: "Horse + Stalk. Horse stop." },
+            "社": { mean: "Company", onyomi: "SHA", kunyomi: "yashiro", trick: "God + Earth. Shrine/Society." }
+        };
+        // 2. LESSON DATABASE
+                // --- COMPLETE 25-LESSON DATABASE ---
         const DATABASE = {
             levels: ["N5", "N4", "N3", "N2", "N1"],
             lessons: {
@@ -129,157 +236,221 @@
                     { id: 2, title: "Demonstratives", desc: "Kore, Sore, Are", vocab: [{ kanji: "これ", kana: "これ", romaji: "kore", mean: "This" }, { kanji: "それ", kana: "それ", romaji: "sore", mean: "That" }], grammar: [{ title: "Ko-So-A-Do", formula: "Kore/Sore/Are", explanation: "Near speaker/Near listener/Far from both.", example: { jp: "それは本です。", en: "That is a book." }}], tricks: [{ title: "Ko-So-A", content: "Ko (Here), So (There), A (Over there)." }], quiz: [{ question: "Which is near the listener?", options: ["Kore", "Sore", "Are"], correct: 1 }] },
                     { id: 3, title: "Locations", desc: "Koko, Asoko, Doko", vocab: [{ kanji: "ここ", kana: "ここ", romaji: "koko", mean: "Here" }, { kanji: "トイレ", kana: "トイレ", romaji: "toire", mean: "Toilet" }], grammar: [{ title: "Place wa doko?", formula: "X wa doko desu ka", explanation: "Where is X?", example: { jp: "トイレはどこですか。", en: "Where is the toilet?" }}], tricks: [{ title: "Politeness", content: "Dochira is politer than Doko." }], quiz: [{ question: "Where is it?", options: ["Doko", "Dare", "Itsu"], correct: 0 }] },
                     { id: 4, title: "Time & Verbs", desc: "Time, Masu-form", vocab: [{ kanji: "今", kana: "いま", romaji: "ima", mean: "Now" }, { kanji: "起きます", kana: "おきます", romaji: "okimasu", mean: "Wake up" }], grammar: [{ title: "Specific Time (Ni)", formula: "Time + ni + Verb", explanation: "Use 'ni' for specific clock time.", example: { jp: "6時に起きます。", en: "I wake at 6." }}], tricks: [{ title: "4 O'Clock", content: "It's Yo-ji, not Yon-ji." }], quiz: [{ question: "Particle for time?", options: ["ni", "de", "to"], correct: 0 }] },
-                    { id: 5, title: "Movement", desc: "Going, Coming", vocab: [{ kanji: "行きます", kana: "いきます", romaji: "ikimasu", mean: "To go" }, { kanji: "電車", kana: "でんしゃ", romaji: "densha", mean: "Train" }], grammar: [{ title: "Movement (e)", formula: "Place + e + ikimasu", explanation: "Use 'he' (read 'e') for direction.", example: { jp: "京都へ行きます。", en: "I go to Kyoto." }}], tricks: [{ title: "Particle E", content: "Write 'he', say 'e'." }], quiz: [{ question: "I go _ taxi.", options: ["ni", "de", "to"], correct: 1 }] },
-                    { id: 6, title: "Direct Objects", desc: "Eating, Drinking", vocab: [{ kanji: "食べます", kana: "たべます", romaji: "tabemasu", mean: "To eat" }, { kanji: "水", kana: "みず", romaji: "mizu", mean: "Water" }], grammar: [{ title: "Object Marker (o)", formula: "Noun + o + Verb", explanation: "Marks the target of action.", example: { jp: "水を飲みます。", en: "I drink water." }}], tricks: [{ title: "De for Action", content: "Place + DE + Action (Eat at home)." }], quiz: [{ question: "Particle for object?", options: ["ga", "wa", "o"], correct: 2 }] },
+                    { id: 5, title: "Movement", desc: "Going, Coming", vocab: [{ kanji: "行", kana: "いく", romaji: "iku", mean: "To go" }, { kanji: "電車", kana: "でんしゃ", romaji: "densha", mean: "Train" }], grammar: [{ title: "Movement (e)", formula: "Place + e + ikimasu", explanation: "Use 'he' (read 'e') for direction.", example: { jp: "京都へ行きます。", en: "I go to Kyoto." }}], tricks: [{ title: "Particle E", content: "Write 'he', say 'e'." }], quiz: [{ question: "I go _ taxi.", options: ["ni", "de", "to"], correct: 1 }] },
+                    { id: 6, title: "Direct Objects", desc: "Eating, Drinking", vocab: [{ kanji: "食", kana: "たべる", romaji: "taberu", mean: "To eat" }, { kanji: "水", kana: "みず", romaji: "mizu", mean: "Water" }], grammar: [{ title: "Object Marker (o)", formula: "Noun + o + Verb", explanation: "Marks the target of action.", example: { jp: "水を飲みます。", en: "I drink water." }}], tricks: [{ title: "De for Action", content: "Place + DE + Action (Eat at home)." }], quiz: [{ question: "Particle for object?", options: ["ga", "wa", "o"], correct: 2 }] },
                     { id: 7, title: "Giving & Receiving", desc: "Tools, Agemasu", vocab: [{ kanji: "手", kana: "て", romaji: "te", mean: "Hand" }, { kanji: "あげます", kana: "あげます", romaji: "agemasu", mean: "To give" }], grammar: [{ title: "Means (de)", formula: "Tool + de + Verb", explanation: "Using a tool.", example: { jp: "はしで食べます。", en: "Eat with chopsticks." }}], tricks: [{ title: "Agemasu", content: "I give OUT." }], quiz: [{ question: "I write _ a pen.", options: ["de", "ni", "o"], correct: 0 }] },
-                    { id: 8, title: "Adjectives", desc: "Describing things", vocab: [{ kanji: "高い", kana: "たかい", romaji: "takai", mean: "Expensive/High" }, { kanji: "静か", kana: "しずか", romaji: "shizuka", mean: "Quiet" }], grammar: [{ title: "Na vs I", formula: "I-adj ends in 'i'.", explanation: "Na-adj needs 'na' before nouns.", example: { jp: "静かな町", en: "A quiet town" }}], tricks: [{ title: "Kirei Trap", content: "Kirei is a NA adjective!" }], quiz: [{ question: "Negative of Samui?", options: ["Samukunai", "Samu janai"], correct: 0 }] },
+                    { id: 8, title: "Adjectives", desc: "Describing things", vocab: [{ kanji: "高", kana: "たかい", romaji: "takai", mean: "Expensive/High" }, { kanji: "静か", kana: "しずか", romaji: "shizuka", mean: "Quiet" }], grammar: [{ title: "Na vs I", formula: "I-adj ends in 'i'.", explanation: "Na-adj needs 'na' before nouns.", example: { jp: "静かな町", en: "A quiet town" }}], tricks: [{ title: "Kirei Trap", content: "Kirei is a NA adjective!" }], quiz: [{ question: "Negative of Samui?", options: ["Samukunai", "Samu janai"], correct: 0 }] },
                     { id: 9, title: "Likes & Skills", desc: "Suki, Kirai, Jouzu", vocab: [{ kanji: "好き", kana: "すき", romaji: "suki", mean: "Like" }, { kanji: "歌", kana: "うた", romaji: "uta", mean: "Song" }], grammar: [{ title: "Ga Suki", formula: "Noun + ga + suki", explanation: "Use 'ga' for likes/skills.", example: { jp: "歌が好きです。", en: "I like songs." }}], tricks: [{ title: "Object is Liked", content: "In Japanese, the object is the subject (GA)." }], quiz: [{ question: "Particle for 'like'?", options: ["o", "ga", "wa"], correct: 1 }] },
-                    { id: 10, title: "Existence", desc: "Imasu vs Arimasu", vocab: [{ kanji: "います", kana: "います", romaji: "imasu", mean: "Exist (Living)" }, { kanji: "あります", kana: "あります", romaji: "arimasu", mean: "Exist (Non-living)" }], grammar: [{ title: "Living Rule", formula: "Imasu (Alive) / Arimasu (Dead)", explanation: "People/Animals = Imasu.", example: { jp: "猫がいます。", en: "There is a cat." }}], tricks: [{ title: "Plants", content: "Plants are alive but use Arimasu (Non-moving)." }], quiz: [{ question: "A taxi is there.", options: ["Imasu", "Arimasu"], correct: 1 }] },
-                    { id: 11, title: "Counters", desc: "Counting things", vocab: [{ kanji: "一つ", kana: "ひとつ", romaji: "hitotsu", mean: "One thing" }, { kanji: "切手", kana: "きって", romaji: "kitte", mean: "Stamp" }], grammar: [{ title: "Native Numbers", formula: "Hitotsu, Futatsu...", explanation: "Used for general objects.", example: { jp: "りんごを二つください。", en: "Two apples please." }}], tricks: [{ title: "No Particle", content: "Numbers don't need particles." }], quiz: [{ question: "Three things?", options: ["Mittsu", "San-ko"], correct: 0 }] },
-                    { id: 12, title: "Comparison", desc: "Yori, Hou ga", vocab: [{ kanji: "寒い", kana: "さむい", romaji: "samui", mean: "Cold" }, { kanji: "雪", kana: "ゆき", romaji: "yuki", mean: "Snow" }], grammar: [{ title: "Comparison", formula: "A wa B yori...", explanation: "A is more... than B.", example: { jp: "中国は日本より大きいです。", en: "China is bigger than Japan." }}], tricks: [{ title: "Yori", content: "Yori = Compared to." }], quiz: [{ question: "Past of Atsui?", options: ["Atsukatta", "Atsuideshita"], correct: 0 }] },
-                    { id: 13, title: "Desires", desc: "Tai form", vocab: [{ kanji: "欲しい", kana: "ほしい", romaji: "hoshii", mean: "Want (noun)" }, { kanji: "行きたい", kana: "いきたい", romaji: "ikitai", mean: "Want to go" }], grammar: [{ title: "Want to do", formula: "Verb-stem + tai desu", explanation: "Conjugates like an I-adjective.", example: { jp: "食べたいです。", en: "I want to eat." }}], tricks: [{ title: "Tai logic", content: "Treat 'Tai' exactly like 'Takai'." }], quiz: [{ question: "I want to drink.", options: ["Nomu tai", "Nomitai"], correct: 1 }] },
-                    { id: 14, title: "The TE Form", desc: "Conjugation", vocab: [{ kanji: "待ってください", kana: "まって", romaji: "matte kudasai", mean: "Please wait" }], grammar: [{ title: "Making Requests", formula: "Te-form + kudasai", explanation: "Polite request.", example: { jp: "書いてください。", en: "Please write." }}], tricks: [{ title: "Song", content: "Ki->Ite, Gi->Ide, Mi/Ni/Bi->Nde." }], quiz: [{ question: "Te-form of Yobimasu?", options: ["Yonde", "Yobite"], correct: 0 }] },
-                    { id: 15, title: "Permissions & Rules", desc: "Te-mo ii, Te-wa ikemasen", vocab: [{ kanji: "置きます", kana: "おきます", romaji: "okimasu", mean: "To put/place" }, { kanji: "住みます", kana: "すみます", romaji: "sumimasu", mean: "To live" }], grammar: [{ title: "Permission", formula: "V-te + mo ii desu ka", explanation: "May I...?", example: { jp: "写真を撮ってもいいですか。", en: "May I take a photo?" } }, { title: "Prohibition", formula: "V-te + wa ikemasen", explanation: "You must not...", example: { jp: "ここで吸ってはいけません。", en: "You must not smoke here." } }], tricks: [{ title: "Wa is HA", content: "In 'Te-wa ikemasen', the particle is written HA." }], quiz: [{ question: "May I eat?", options: ["Tabete mo ii desu ka", "Tabete wa ikemasen ka"], correct: 0 }] },
-                    { id: 16, title: "Sequences", desc: "Connecting sentences", vocab: [{ kanji: "乗ります", kana: "のります", romaji: "norimasu", mean: "Ride/Get on" }, { kanji: "降ります", kana: "おります", romaji: "orimasu", mean: "Get off" }], grammar: [{ title: "Sequence of Action", formula: "V-te, V-te, ...", explanation: "I did A, then B, then C.", example: { jp: "朝起きて、ご飯を食べて、行きます。", en: "I wake up, eat, and go." } }, { title: "After doing", formula: "V-te + kara", explanation: "After finishing A, I do B.", example: { jp: "終わってから、食べます。", en: "After finishing, I will eat." } }], tricks: [{ title: "Adjectives too", content: "I-adj -> Kute (Takakute). Na-adj -> De (Shizuka de)." }], quiz: [{ question: "Connect 'Ookii' (Big)", options: ["Ookikute", "Ookii de"], correct: 0 }] },
+                    { id: 10, title: "Existence", desc: "Imasu vs Arimasu", vocab: [{ kanji: "人", kana: "ひと", romaji: "hito", mean: "Person" }, { kanji: "車", kana: "くるま", romaji: "kuruma", mean: "Car" }], grammar: [{ title: "Living Rule", formula: "Imasu (Alive) / Arimasu (Dead)", explanation: "People/Animals = Imasu.", example: { jp: "猫がいます。", en: "There is a cat." }}], tricks: [{ title: "Plants", content: "Plants are alive but use Arimasu (Non-moving)." }], quiz: [{ question: "A taxi is there.", options: ["Imasu", "Arimasu"], correct: 1 }] },
+                    { id: 11, title: "Counters", desc: "Counting things", vocab: [{ kanji: "一", kana: "ひとつ", romaji: "hitotsu", mean: "One thing" }, { kanji: "二", kana: "ふたつ", romaji: "futatsu", mean: "Two things" }], grammar: [{ title: "Native Numbers", formula: "Hitotsu, Futatsu...", explanation: "Used for general objects.", example: { jp: "りんごを二つください。", en: "Two apples please." }}], tricks: [{ title: "No Particle", content: "Numbers don't need particles." }], quiz: [{ question: "Three things?", options: ["Mittsu", "San-ko"], correct: 0 }] },
+                    { id: 12, title: "Comparison", desc: "Yori, Hou ga", vocab: [{ kanji: "寒", kana: "さむい", romaji: "samui", mean: "Cold" }, { kanji: "雪", kana: "ゆき", romaji: "yuki", mean: "Snow" }], grammar: [{ title: "Comparison", formula: "A wa B yori...", explanation: "A is more... than B.", example: { jp: "中国は日本より大きいです。", en: "China is bigger than Japan." }}], tricks: [{ title: "Yori", content: "Yori = Compared to." }], quiz: [{ question: "Past of Atsui?", options: ["Atsukatta", "Atsuideshita"], correct: 0 }] },
+                    { id: 13, title: "Desires", desc: "Tai form", vocab: [{ kanji: "欲", kana: "ほしい", romaji: "hoshii", mean: "Want (noun)" }, { kanji: "行", kana: "いきたい", romaji: "ikitai", mean: "Want to go" }], grammar: [{ title: "Want to do", formula: "Verb-stem + tai desu", explanation: "Conjugates like an I-adjective.", example: { jp: "食べたいです。", en: "I want to eat." }}], tricks: [{ title: "Tai logic", content: "Treat 'Tai' exactly like 'Takai'." }], quiz: [{ question: "I want to drink.", options: ["Nomu tai", "Nomitai"], correct: 1 }] },
+                    { id: 14, title: "The TE Form", desc: "Conjugation", vocab: [{ kanji: "待", kana: "まって", romaji: "matte", mean: "Wait" }], grammar: [{ title: "Making Requests", formula: "Te-form + kudasai", explanation: "Polite request.", example: { jp: "書いてください。", en: "Please write." }}], tricks: [{ title: "Song", content: "Ki->Ite, Gi->Ide, Mi/Ni/Bi->Nde." }], quiz: [{ question: "Te-form of Yobimasu?", options: ["Yonde", "Yobite"], correct: 0 }] },
+                    { id: 15, title: "Permissions & Rules", desc: "Te-mo ii, Te-wa ikemasen", vocab: [{ kanji: "置", kana: "おきます", romaji: "okimasu", mean: "To put/place" }, { kanji: "住", kana: "すみます", romaji: "sumimasu", mean: "To live" }], grammar: [{ title: "Permission", formula: "V-te + mo ii desu ka", explanation: "May I...?", example: { jp: "写真を撮ってもいいですか。", en: "May I take a photo?" } }, { title: "Prohibition", formula: "V-te + wa ikemasen", explanation: "You must not...", example: { jp: "ここで吸ってはいけません。", en: "You must not smoke here." } }], tricks: [{ title: "Wa is HA", content: "In 'Te-wa ikemasen', the particle is written HA." }], quiz: [{ question: "May I eat?", options: ["Tabete mo ii desu ka", "Tabete wa ikemasen ka"], correct: 0 }] },
+                    { id: 16, title: "Sequences", desc: "Connecting sentences", vocab: [{ kanji: "乗", kana: "のります", romaji: "norimasu", mean: "Ride/Get on" }, { kanji: "降", kana: "おります", romaji: "orimasu", mean: "Get off" }], grammar: [{ title: "Sequence of Action", formula: "V-te, V-te, ...", explanation: "I did A, then B, then C.", example: { jp: "朝起きて、ご飯を食べて、行きます。", en: "I wake up, eat, and go." } }, { title: "After doing", formula: "V-te + kara", explanation: "After finishing A, I do B.", example: { jp: "終わってから、食べます。", en: "After finishing, I will eat." } }], tricks: [{ title: "Adjectives too", content: "I-adj -> Kute (Takakute). Na-adj -> De (Shizuka de)." }], quiz: [{ question: "Connect 'Ookii' (Big)", options: ["Ookikute", "Ookii de"], correct: 0 }] },
                     { id: 17, title: "The NAI Form", desc: "Must & Please don't", vocab: [{ kanji: "心配", kana: "しんぱい", romaji: "shinpai", mean: "Worry" }, { kanji: "残業", kana: "ざんぎょう", romaji: "zangyou", mean: "Overtime work" }], grammar: [{ title: "Please don't", formula: "V-nai + de kudasai", explanation: "Negative request.", example: { jp: "写真を撮らないでください。", en: "Please don't take photos." } }, { title: "Obligation (Must)", formula: "V-nai (drop i) + kereba narimasen", explanation: "I must do...", example: { jp: "薬を飲まなければなりません。", en: "I must take medicine." } }], tricks: [{ title: "Nakereba Narimasen", content: "Lit: 'If I don't do it, it won't become.' = I must." }], quiz: [{ question: "Nai form of 'Kakimasu'?", options: ["Kakinai", "Kakanai"], correct: 1 }] },
                     { id: 18, title: "Dictionary Form", desc: "Can do, Hobbies", vocab: [{ kanji: "運転", kana: "うんてん", romaji: "unten", mean: "Driving" }, { kanji: "趣味", kana: "しゅみ", romaji: "shumi", mean: "Hobby" }], grammar: [{ title: "Potential (Can)", formula: "V-dict + koto ga dekimasu", explanation: "I can do...", example: { jp: "漢字を読むことができます。", en: "I can read Kanji." } }, { title: "Before...", formula: "V-dict + mae ni", explanation: "Before doing X...", example: { jp: "寝る前に本を読みます。", en: "I read before sleeping." } }], tricks: [{ title: "Koto", content: "'Koto' turns a verb into a noun so particles can stick to it." }], quiz: [{ question: "I can swim.", options: ["Oyogu dekimasu", "Oyogu koto ga dekimasu"], correct: 1 }] },
-                    { id: 19, title: "The TA Form", desc: "Experience & Variety", vocab: [{ kanji: "登ります", kana: "のぼります", romaji: "noborimasu", mean: "To climb" }, { kanji: "なります", kana: "なります", romaji: "narimasu", mean: "To become" }], grammar: [{ title: "Experience", formula: "V-ta + koto ga arimasu", explanation: "I have done...", example: { jp: "馬に乗ったことがあります。", en: "I have ridden a horse." } }, { title: "Variety (Tari Tari)", formula: "V-ta + ri, V-ta + ri shimasu", explanation: "Do things like A and B.", example: { jp: "本を読んだり、寝たりします。", en: "I do things like reading and sleeping." } }], tricks: [{ title: "Ta Form", content: "Conjugates EXACTLY like the Te Form. Just change Te to Ta." }], quiz: [{ question: "Have you eaten?", options: ["Tabeta koto ga arimasu ka", "Taberu koto ga arimasu ka"], correct: 0 }] },
-                    { id: 20, title: "Plain Style", desc: "Casual Speech", vocab: [{ kanji: "要ります", kana: "いります", romaji: "irimasu", mean: "Need (visa etc)" }, { kanji: "調べる", kana: "しらべる", romaji: "shiraberu", mean: "Check/Investigate" }], grammar: [{ title: "Casual Style", formula: "Drop Masu/Desu", explanation: "Use Dictionary/Ta/Nai forms directly.", example: { jp: "明日、東京へ行く？", en: "Going to Tokyo tomorrow?" } }, { title: "But...", formula: "Kedo", explanation: "Replace 'Ga' with 'Kedo' in casual speech.", example: { jp: "美味しいけど、高い。", en: "It's good, but expensive." } }], tricks: [{ title: "Question Mark", content: "In casual speech, 'Ka' is dropped. Rise intonation instead." }], quiz: [{ question: "Casual 'Tabemasu'", options: ["Taberu", "Tabero"], correct: 0 }] },
-                    { id: 21, title: "Thoughts & Quotes", desc: "To omoimasu", vocab: [{ kanji: "思います", kana: "おもいます", romaji: "omoimasu", mean: "To think" }, { kanji: "言います", kana: "いいます", romaji: "iimasu", mean: "To say" }], grammar: [{ title: "I think...", formula: "Plain Form + to omoimasu", explanation: "Expressing opinion.", example: { jp: "明日は雨だと思います。", en: "I think it will rain tomorrow." } }, { title: "He said...", formula: "Plain Form + to iimashita", explanation: "Quoting someone.", example: { jp: "彼は「行く」と言いました。", en: "He said he would go." } }], tricks: [{ title: "Da for Nouns", content: "For Nouns/Na-adj, add 'da' before 'to omoimasu'." }], quiz: [{ question: "I think it is expensive.", options: ["Takai omoimasu", "Takai to omoimasu"], correct: 1 }] },
-                    { id: 22, title: "Noun Modification", desc: "Relative Clauses", vocab: [{ kanji: "着ます", kana: "きます", romaji: "kimasu", mean: "To wear (shirt)" }, { kanji: "帽子", kana: "ぼうし", romaji: "boushi", mean: "Hat" }], grammar: [{ title: "Relative Clause", formula: "Sentence + Noun", explanation: "Describing a noun with a verb phrase.", example: { jp: "これは私が撮った写真です。", en: "This is the photo I took." } }, { title: "Time to...", formula: "V-dict + jikan", explanation: "Time to do X.", example: { jp: "朝ごはんを食べる時間がありません。", en: "I have no time to eat breakfast." } }], tricks: [{ title: "No WA inside", content: "Inside a modifying clause, 'Wa' usually becomes 'Ga'." }], quiz: [{ question: "The book I bought.", options: ["Watashi ga katta hon", "Watashi wa kau hon"], correct: 0 }] },
-                    { id: 23, title: "When & If", desc: "Toki, To", vocab: [{ kanji: "回します", kana: "まわします", romaji: "mawashimasu", mean: "Turn (knob)" }, { kanji: "信号", kana: "しんごう", romaji: "shingou", mean: "Traffic light" }], grammar: [{ title: "When...", formula: "V-dict/V-ta + toki", explanation: "Use Dict for 'before', Ta for 'after'.", example: { jp: "家へ帰るとき、買いました。", en: "I bought it on the way home." } }, { title: "Inevitable If", formula: "V-dict + to", explanation: "If you do A, B happens naturally (machines/nature).", example: { jp: "右へ回すと、音が大きくなります。", en: "If you turn right, volume goes up." } }], tricks: [{ title: "Toki Timing", content: "Iku toki (Before I go). Itta toki (After I went)." }], quiz: [{ question: "When I was a child...", options: ["Kodomo no toki", "Kodomo na toki"], correct: 0 }] },
-                    { id: 24, title: "Giving & Receiving II", desc: "Kuremasu", vocab: [{ kanji: "くれます", kana: "くれます", romaji: "kuremasu", mean: "Give (to me)" }, { kanji: "直します", kana: "なおします", romaji: "naoshimasu", mean: "Repair" }], grammar: [{ title: "Gave to ME", formula: "Giver wa Watashi ni Kuremasu", explanation: "Agemasu is me to others. Kuremasu is others to me.", example: { jp: "佐藤さんは私に花をくれました。", en: "Ms. Sato gave me flowers." } }, { title: "Kind Actions", formula: "V-te + moraimasu/kuremasu", explanation: "Receiving a favor.", example: { jp: "田中さんが送ってくれました。", en: "Mr. Tanaka (kindly) sent me." } }], tricks: [{ title: "Kuremasu", content: "Think 'Come'. It comes to me." }], quiz: [{ question: "He helped me.", options: ["Tetsudatte kuremashita", "Tetsudatte agemashita"], correct: 0 }] },
-                    { id: 25, title: "Conditionals", desc: "Tara, Temo", vocab: [{ kanji: "考えます", kana: "かんがえます", romaji: "kangaemasu", mean: "Think/Consider" }, { kanji: "駅", kana: "えき", romaji: "eki", mean: "Station" }], grammar: [{ title: "If (Tara)", formula: "V-ta + ra", explanation: "General conditional. If/When.", example: { jp: "雨が降ったら、行きません。", en: "If it rains, I won't go." } }, { title: "Even if (Temo)", formula: "V-te + mo", explanation: "Even if X, Y.", example: { jp: "高くても、買います。", en: "Even if expensive, I will buy it." } }], tricks: [{ title: "Tara is King", content: "'Tara' is the safest 'If' to use in most daily situations." }], quiz: [{ question: "If I have money...", options: ["Okane ga attara", "Okane ga attemo"], correct: 0 }] }
+                    { id: 19, title: "The TA Form", desc: "Experience & Variety", vocab: [{ kanji: "登", kana: "のぼります", romaji: "noborimasu", mean: "To climb" }, { kanji: "成", kana: "なります", romaji: "narimasu", mean: "To become" }], grammar: [{ title: "Experience", formula: "V-ta + koto ga arimasu", explanation: "I have done...", example: { jp: "馬に乗ったことがあります。", en: "I have ridden a horse." } }, { title: "Variety (Tari Tari)", formula: "V-ta + ri, V-ta + ri shimasu", explanation: "Do things like A and B.", example: { jp: "本を読んだり、寝たりします。", en: "I do things like reading and sleeping." } }], tricks: [{ title: "Ta Form", content: "Conjugates EXACTLY like the Te Form. Just change Te to Ta." }], quiz: [{ question: "Have you eaten?", options: ["Tabeta koto ga arimasu ka", "Taberu koto ga arimasu ka"], correct: 0 }] },
+                    { id: 20, title: "Plain Style", desc: "Casual Speech", vocab: [{ kanji: "要", kana: "いります", romaji: "irimasu", mean: "Need (visa etc)" }, { kanji: "調", kana: "しらべる", romaji: "shiraberu", mean: "Check/Investigate" }], grammar: [{ title: "Casual Style", formula: "Drop Masu/Desu", explanation: "Use Dictionary/Ta/Nai forms directly.", example: { jp: "明日、東京へ行く？", en: "Going to Tokyo tomorrow?" } }, { title: "But...", formula: "Kedo", explanation: "Replace 'Ga' with 'Kedo' in casual speech.", example: { jp: "美味しいけど、高い。", en: "It's good, but expensive." } }], tricks: [{ title: "Question Mark", content: "In casual speech, 'Ka' is dropped. Rise intonation instead." }], quiz: [{ question: "Casual 'Tabemasu'", options: ["Taberu", "Tabero"], correct: 0 }] },
+                    { id: 21, title: "Thoughts & Quotes", desc: "To omoimasu", vocab: [{ kanji: "思", kana: "おもいます", romaji: "omoimasu", mean: "To think" }, { kanji: "言", kana: "いいます", romaji: "iimasu", mean: "To say" }], grammar: [{ title: "I think...", formula: "Plain Form + to omoimasu", explanation: "Expressing opinion.", example: { jp: "明日は雨だと思います。", en: "I think it will rain tomorrow." } }, { title: "He said...", formula: "Plain Form + to iimashita", explanation: "Quoting someone.", example: { jp: "彼は「行く」と言いました。", en: "He said he would go." } }], tricks: [{ title: "Da for Nouns", content: "For Nouns/Na-adj, add 'da' before 'to omoimasu'." }], quiz: [{ question: "I think it is expensive.", options: ["Takai omoimasu", "Takai to omoimasu"], correct: 1 }] },
+                    { id: 22, title: "Noun Modification", desc: "Relative Clauses", vocab: [{ kanji: "着", kana: "きます", romaji: "kimasu", mean: "To wear (shirt)" }, { kanji: "帽子", kana: "ぼうし", romaji: "boushi", mean: "Hat" }], grammar: [{ title: "Relative Clause", formula: "Sentence + Noun", explanation: "Describing a noun with a verb phrase.", example: { jp: "これは私が撮った写真です。", en: "This is the photo I took." } }, { title: "Time to...", formula: "V-dict + jikan", explanation: "Time to do X.", example: { jp: "朝ごはんを食べる時間がありません。", en: "I have no time to eat breakfast." } }], tricks: [{ title: "No WA inside", content: "Inside a modifying clause, 'Wa' usually becomes 'Ga'." }], quiz: [{ question: "The book I bought.", options: ["Watashi ga katta hon", "Watashi wa kau hon"], correct: 0 }] },
+                    { id: 23, title: "When & If", desc: "Toki, To", vocab: [{ kanji: "回", kana: "まわします", romaji: "mawashimasu", mean: "Turn (knob)" }, { kanji: "信号", kana: "しんごう", romaji: "shingou", mean: "Traffic light" }], grammar: [{ title: "When...", formula: "V-dict/V-ta + toki", explanation: "Use Dict for 'before', Ta for 'after'.", example: { jp: "家へ帰るとき、買いました。", en: "I bought it on the way home." } }, { title: "Inevitable If", formula: "V-dict + to", explanation: "If you do A, B happens naturally (machines/nature).", example: { jp: "右へ回すと、音が大きくなります。", en: "If you turn right, volume goes up." } }], tricks: [{ title: "Toki Timing", content: "Iku toki (Before I go). Itta toki (After I went)." }], quiz: [{ question: "When I was a child...", options: ["Kodomo no toki", "Kodomo na toki"], correct: 0 }] },
+                    { id: 24, title: "Giving & Receiving II", desc: "Kuremasu", vocab: [{ kanji: "くれ", kana: "くれます", romaji: "kuremasu", mean: "Give (to me)" }, { kanji: "直", kana: "なおします", romaji: "naoshimasu", mean: "Repair" }], grammar: [{ title: "Gave to ME", formula: "Giver wa Watashi ni Kuremasu", explanation: "Agemasu is me to others. Kuremasu is others to me.", example: { jp: "佐藤さんは私に花をくれました。", en: "Ms. Sato gave me flowers." } }, { title: "Kind Actions", formula: "V-te + moraimasu/kuremasu", explanation: "Receiving a favor.", example: { jp: "田中さんが送ってくれました。", en: "Mr. Tanaka (kindly) sent me." } }], tricks: [{ title: "Kuremasu", content: "Think 'Come'. It comes to me." }], quiz: [{ question: "He helped me.", options: ["Tetsudatte kuremashita", "Tetsudatte agemashita"], correct: 0 }] },
+                    { id: 25, title: "Conditionals", desc: "Tara, Temo", vocab: [{ kanji: "考", kana: "かんがえます", romaji: "kangaemasu", mean: "Think/Consider" }, { kanji: "駅", kana: "えき", romaji: "eki", mean: "Station" }], grammar: [{ title: "If (Tara)", formula: "V-ta + ra", explanation: "General conditional. If/When.", example: { jp: "雨が降ったら、行きません。", en: "If it rains, I won't go." } }, { title: "Even if (Temo)", formula: "V-te + mo", explanation: "Even if X, Y.", example: { jp: "高くても、買います。", en: "Even if expensive, I will buy it." } }], tricks: [{ title: "Tara is King", content: "'Tara' is the safest 'If' to use in most daily situations." }], quiz: [{ question: "If I have money...", options: ["Okane ga attara", "Okane ga attemo"], correct: 0 }] }
                 ]
             }
         };
 
-        // --- COMPONENTS ---
+        /* --- PART 3: UI COMPONENTS --- */
 
-        // 1. KANJI MODAL (INTERACTIVE)
+        // 1. KANJI MODAL (The Popup)
         const KanjiModal = ({ kanji, data, onClose }) => {
             if (!kanji) return null;
             return (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 fade-in" onClick={onClose}>
-                    <div className="bg-white rounded-3xl p-8 w-full max-w-lg shadow-2xl relative pop-in overflow-hidden" onClick={e => e.stopPropagation()}>
-                        {/* Header Decoration */}
-                        <div className="absolute top-0 left-0 w-full h-3 bg-pink-400"></div>
+                    <div className="glass-card rounded-3xl p-8 w-full max-w-lg relative pop-in overflow-hidden" onClick={e => e.stopPropagation()}>
+                        <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-pink-400 to-purple-400"></div>
+                        <button onClick={onClose} className="absolute top-5 right-5 text-slate-300 hover:text-pink-500 text-3xl transition-colors">&times;</button>
                         
-                        <button onClick={onClose} className="absolute top-5 right-5 text-slate-300 hover:text-pink-500 text-3xl">&times;</button>
-                        
-                        <div className="text-center mt-4">
-                            <span className="kanji-font text-8xl text-slate-800 leading-none drop-shadow-md">{kanji}</span>
-                            <h2 className="text-3xl font-bold text-pink-500 mt-4">{data.mean}</h2>
+                        <div className="text-center mt-2">
+                            <span className="kanji-font text-9xl text-slate-800 leading-none drop-shadow-lg">{kanji}</span>
+                            <h2 className="text-3xl font-bold text-pink-500 mt-4 capitalize">{data.mean}</h2>
                         </div>
 
-                        {/* Readings Grid */}
-                        <div className="grid grid-cols-2 gap-4 mt-8 bg-slate-50 p-4 rounded-xl border border-slate-100">
-                            <div>
-                                <span className="text-xs font-bold text-slate-400 tracking-widest uppercase block mb-1">Onyomi (Sound)</span>
+                        <div className="grid grid-cols-2 gap-4 mt-8 bg-slate-50/80 p-4 rounded-2xl border border-slate-100">
+                            <div className="text-center border-r border-slate-200">
+                                <span className="text-[10px] font-bold text-slate-400 tracking-widest uppercase block mb-1">Onyomi (Sound)</span>
                                 <span className="text-lg font-bold text-slate-700">{data.onyomi}</span>
                             </div>
-                            <div>
-                                <span className="text-xs font-bold text-slate-400 tracking-widest uppercase block mb-1">Kunyomi (Meaning)</span>
+                            <div className="text-center">
+                                <span className="text-[10px] font-bold text-slate-400 tracking-widest uppercase block mb-1">Kunyomi (Meaning)</span>
                                 <span className="text-lg font-bold text-slate-700">{data.kunyomi}</span>
                             </div>
                         </div>
 
-                        {/* Memory Trick Box */}
-                        <div className="mt-6 bg-yellow-50 p-5 rounded-xl border-l-4 border-yellow-400">
-                            <h3 className="text-yellow-800 font-bold flex items-center gap-2 mb-2">
-                                <i className="fas fa-brain"></i> Memory Trick
+                        <div className="mt-6 bg-yellow-50/90 p-5 rounded-2xl border-l-4 border-yellow-400 shadow-sm">
+                            <h3 className="text-yellow-800 font-bold flex items-center gap-2 mb-2 text-sm uppercase tracking-wide">
+                                <i className="fas fa-lightbulb"></i> Memory Trick
                             </h3>
-                            <p className="text-slate-700 italic leading-relaxed">
+                            <p className="text-slate-700 italic leading-relaxed text-lg font-medium">
                                 {data.trick}
                             </p>
-                        </div>
-
-                        {/* Footer Action */}
-                        <div className="mt-8 text-center">
-                            <button onClick={onClose} className="bg-slate-100 hover:bg-slate-200 text-slate-600 px-6 py-2 rounded-full font-bold transition-colors">
-                                Close Card
-                            </button>
                         </div>
                     </div>
                 </div>
             );
         };
 
-        // 2. Level Selector (Home)
-        const LevelSelect = ({ onSelect }) => (
-            <div className="h-full w-full overflow-y-auto flex flex-col items-center p-4 fade-in relative z-10 scroll-smooth">
+        // 2. GRAND LIBRARY (Browse 100+ Kanji)
+        const GrandLibrary = ({ onBack }) => {
+            const [search, setSearch] = useState("");
+            const [selectedKanji, setSelectedKanji] = useState(null);
+
+            // Convert Object to Array and Filter
+            const filteredKanji = Object.entries(KANJI_LIB).filter(([char, data]) => {
+                const term = search.toLowerCase();
+                return char.includes(term) || 
+                       data.mean.toLowerCase().includes(term) || 
+                       data.trick.toLowerCase().includes(term);
+            });
+
+            return (
+                <div className="h-full flex flex-col fade-in relative z-20">
+                    <SakuraBackground />
+                    {selectedKanji && <KanjiModal kanji={selectedKanji.char} data={selectedKanji.data} onClose={() => setSelectedKanji(null)} />}
+
+                    <div className="flex-none p-6 glass-panel flex flex-col md:flex-row items-center justify-between gap-4 z-30">
+                        <div className="flex items-center gap-4 w-full md:w-auto">
+                            <button onClick={onBack} className="text-slate-500 hover:text-pink-600 transition-colors">
+                                <i className="fas fa-arrow-left text-xl"></i>
+                            </button>
+                            <h2 className="text-2xl font-bold text-slate-800">Grand Kanji Library</h2>
+                        </div>
+                        <div className="relative w-full md:w-96">
+                            <i className="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                            <input 
+                                type="text" 
+                                placeholder="Search 'Sun', 'Tree', 'Fire'..." 
+                                className="w-full pl-12 pr-4 py-3 rounded-full border-none shadow-inner bg-slate-100 focus:bg-white focus:ring-2 focus:ring-pink-300 transition-all outline-none"
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto p-6 md:p-10 scroll-smooth">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 pb-20 max-w-7xl mx-auto">
+                            {filteredKanji.map(([char, data]) => (
+                                <div 
+                                    key={char}
+                                    onClick={() => setSelectedKanji({ char, data })}
+                                    className="bg-white rounded-3xl p-6 aspect-square flex flex-col items-center justify-center shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all cursor-pointer border border-slate-100 group relative overflow-hidden"
+                                >
+                                    <div className="absolute inset-0 bg-gradient-to-br from-pink-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                    <span className="kanji-font text-5xl text-slate-700 group-hover:text-pink-500 transition-colors relative z-10">{char}</span>
+                                    <span className="text-xs font-bold text-slate-400 mt-3 text-center line-clamp-1 relative z-10 group-hover:text-pink-400">{data.mean}</span>
+                                </div>
+                            ))}
+                        </div>
+                        {filteredKanji.length === 0 && (
+                            <div className="text-center py-20 text-slate-400">
+                                <i className="fas fa-ghost text-4xl mb-4"></i>
+                                <p>No Kanji found matching "{search}"</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        // 3. HOME SCREEN (Level Select)
+        const LevelSelect = ({ onSelect, onOpenLibrary }) => (
+            <div className="h-full w-full overflow-y-auto flex flex-col items-center p-4 fade-in relative z-10">
                 <SakuraBackground />
                 <div className="w-full max-w-4xl my-auto py-10 flex flex-col gap-8">
-                    <div className="text-center">
-                        <span className="inline-block py-1 px-3 rounded-full bg-pink-100 text-pink-600 text-xs font-bold tracking-wider mb-2">ULTIMATE EDITION</span>
-                        <h1 className="text-5xl md:text-7xl font-extrabold text-slate-800 tracking-tight">NIHONGO <span className="text-pink-500">PRO</span></h1>
+                    <div className="text-center slide-up">
+                        <span className="inline-block py-1 px-4 rounded-full bg-pink-100 text-pink-600 text-xs font-bold tracking-widest mb-3 shadow-sm">ULTIMATE EDITION</span>
+                        <h1 className="text-6xl md:text-8xl font-black text-slate-800 tracking-tighter drop-shadow-sm">
+                            NIHONGO <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-500">PRO</span>
+                        </h1>
                     </div>
-                    <div className="glass-panel rounded-3xl p-8 md:p-10 relative overflow-hidden group hover:shadow-pink-100/50 hover:shadow-2xl transition-all duration-500 border-l-4 border-l-pink-400">
-                        <div className="absolute top-2 right-6 text-9xl text-pink-100 font-serif opacity-50 select-none">”</div>
+
+                    {/* PIYUSH PAL CARD */}
+                    <div className="glass-panel rounded-3xl p-8 md:p-10 relative overflow-hidden hover-lift border-l-4 border-pink-400 slide-up" style={{animationDelay: '0.1s'}}>
+                        <div className="absolute top-4 right-8 text-[120px] text-pink-500/10 font-serif leading-none select-none">”</div>
                         <div className="relative z-10">
                             <h3 className="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-3">
-                                <span className="w-10 h-10 rounded-full bg-pink-500 flex items-center justify-center text-white text-lg font-bold shadow-md">P</span>
+                                <span className="w-12 h-12 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-white text-xl font-bold shadow-lg">P</span>
                                 Hi, I’m Piyush Pal.
                             </h3>
                             <div className="space-y-4 text-slate-600 leading-relaxed text-lg font-medium">
-                                <p>I built <span className="text-pink-600 font-bold">Nihongo Pro</span> from my heart.</p>
-                                <p>Japan has always inspired me — not just the language, but the discipline, calmness, and respect for effort.</p>
-                                <p>When I started learning Japanese, I felt lost between too many resources and no clear path. So I decided to build my own.</p>
-                                <p>Nihongo Pro follows the JLPT N5 structure, but it’s designed to feel <span className="italic text-slate-800">peaceful, logical, and human.</span></p>
-                                <p className="pt-2">This platform will grow as I grow. If you’re learning Japanese with genuine curiosity — <span className="text-pink-600 font-bold">welcome.</span></p>
-                            </div>
-                            <div className="mt-8 pt-6 border-t border-slate-200/60 flex justify-between items-center">
-                                <div className="text-xs font-bold text-pink-400 uppercase tracking-widest">CREATOR & DEVELOPER</div>
-                                <div className="font-serif italic text-slate-400 text-xl pr-4">Piyush Pal</div>
+                                <p>I built <span className="text-pink-600 font-bold">Nihongo Pro</span> to make Japanese feel peaceful, logical, and human.</p>
+                                <p>Below, choose your path or explore the new <span className="font-bold text-slate-800">Grand Library</span> to see all 100+ N5 Kanji at once.</p>
                             </div>
                         </div>
                     </div>
-                    <div>
-                        <p className="text-slate-400 text-center mb-6 text-sm font-bold uppercase tracking-widest">Select Your Path</p>
-                        <div className="grid grid-cols-1 sm:grid-cols-5 gap-4 w-full">
-                            {DATABASE.levels.map((lvl) => (
-                                <button 
-                                    key={lvl}
-                                    onClick={() => onSelect(lvl)}
-                                    className={`group relative p-6 rounded-2xl border-2 transition-all duration-300 overflow-hidden ${lvl === 'N5' ? 'border-pink-400 bg-white/80 shadow-lg hover:shadow-pink-200/50 hover:-translate-y-1 cursor-pointer' : 'border-slate-200 bg-slate-50/50 text-slate-300 cursor-not-allowed'}`}
-                                >
-                                    <div className={`absolute inset-0 bg-pink-500 opacity-0 ${lvl === 'N5' ? 'group-hover:opacity-5' : ''} transition-opacity`}></div>
-                                    <span className={`text-3xl font-bold relative z-10 ${lvl === 'N5' ? 'text-slate-800' : ''}`}>{lvl}</span>
-                                    {lvl === 'N5' && <div className="text-xs text-pink-500 font-bold mt-1">UNLOCKED</div>}
-                                </button>
-                            ))}
+                    
+                    {/* BUTTONS */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 slide-up" style={{animationDelay: '0.2s'}}>
+                        {/* Course Path */}
+                        <div className="bg-white/80 p-6 rounded-3xl border border-white shadow-lg">
+                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Start Learning</p>
+                            <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar">
+                                {DATABASE.levels.map((lvl) => (
+                                    <button 
+                                        key={lvl}
+                                        onClick={() => lvl === "N5" ? onSelect(lvl) : alert("Locked in Demo")}
+                                        className={`flex-none w-20 h-20 rounded-2xl flex items-center justify-center text-2xl font-bold transition-all ${lvl === 'N5' ? 'bg-slate-800 text-white shadow-xl hover:scale-105' : 'bg-slate-100 text-slate-300 cursor-not-allowed'}`}
+                                    >
+                                        {lvl}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
+
+                        {/* Library Button */}
+                        <button onClick={onOpenLibrary} className="bg-gradient-to-br from-pink-500 to-purple-600 p-6 rounded-3xl text-white shadow-lg shadow-pink-200 hover:shadow-xl hover:scale-[1.02] transition-all text-left group relative overflow-hidden">
+                            <div className="absolute right-0 bottom-0 opacity-20 text-9xl -mr-6 -mb-6 rotate-12"><i className="fas fa-book"></i></div>
+                            <h3 className="text-2xl font-bold mb-1">Grand Library</h3>
+                            <p className="text-pink-100 font-medium">Browse 100+ Kanji & Tricks</p>
+                            <div className="mt-6 inline-flex items-center gap-2 bg-white/20 px-4 py-2 rounded-full text-sm font-bold backdrop-blur-sm group-hover:bg-white/30 transition-colors">
+                                Open Database <i className="fas fa-arrow-right"></i>
+                            </div>
+                        </button>
                     </div>
                 </div>
             </div>
         );
 
-        // 3. Lesson Dashboard
+        // 4. LESSON LIST
         const LessonDashboard = ({ level, onBack, onSelectLesson }) => (
             <div className="h-full flex flex-col fade-in relative z-10">
                 <SakuraBackground />
-                <div className="flex-none p-4 md:p-6 glass-panel border-b border-white/40 flex items-center justify-between z-20 shadow-sm backdrop-blur-md">
-                    <button onClick={onBack} className="text-slate-500 hover:text-pink-600 font-bold px-4 py-2 rounded-full hover:bg-pink-50 transition-colors">
-                        <i className="fas fa-arrow-left mr-2"></i> Back
+                <div className="flex-none p-6 glass-panel flex items-center justify-between z-20">
+                    <button onClick={onBack} className="text-slate-500 hover:text-pink-600 font-bold px-4 py-2 rounded-full hover:bg-white transition-all">
+                        <i className="fas fa-arrow-left mr-2"></i> Home
                     </button>
-                    <h2 className="text-xl font-bold text-slate-800">{level} CURRICULUM</h2>
-                    <div className="w-12"></div>
+                    <h2 className="text-xl font-bold text-slate-800 tracking-wide">{level} CURRICULUM</h2>
+                    <div className="w-16"></div>
                 </div>
-                <div className="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth">
-                    <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 pb-24">
-                        {DATABASE.lessons[level].map((lesson) => (
+                <div className="flex-1 overflow-y-auto p-6 md:p-10 scroll-smooth">
+                    <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-24">
+                        {DATABASE.lessons[level].map((lesson, i) => (
                             <div 
                                 key={lesson.id} 
                                 onClick={() => onSelectLesson(lesson)}
-                                className="group relative p-6 bg-white/90 backdrop-blur-sm rounded-2xl border border-white shadow-sm transition-all hover:border-pink-300 hover:shadow-xl hover:shadow-pink-100/50 hover:-translate-y-1 cursor-pointer flex flex-col justify-between h-48"
+                                className="group bg-white/80 backdrop-blur-sm p-8 rounded-3xl border border-white shadow-sm hover:shadow-xl hover:border-pink-200 hover:-translate-y-1 transition-all cursor-pointer flex flex-col justify-between h-56 relative overflow-hidden"
                             >
-                                <div>
-                                    <div className="flex justify-between items-start mb-2">
-                                        <span className="text-xs font-bold tracking-wider text-white bg-pink-400 px-2 py-1 rounded-md shadow-sm">LESSON {lesson.id}</span>
-                                        <span className="text-slate-300 group-hover:text-pink-400 text-2xl"><i className="fas fa-chevron-right"></i></span>
-                                    </div>
-                                    <h3 className="text-xl font-bold text-slate-800 mb-2 line-clamp-1">{lesson.title}</h3>
-                                    <p className="text-sm text-slate-500 leading-relaxed line-clamp-2">{lesson.desc}</p>
+                                <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-slate-50 to-pink-50 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+                                <div className="relative z-10">
+                                    <span className="text-xs font-bold tracking-widest text-pink-500 uppercase mb-2 block">Lesson {lesson.id}</span>
+                                    <h3 className="text-2xl font-bold text-slate-800 mb-2 leading-tight">{lesson.title}</h3>
+                                    <p className="text-slate-500 font-medium leading-relaxed">{lesson.desc}</p>
+                                </div>
+                                <div className="relative z-10 flex justify-end">
+                                    <span className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-slate-300 group-hover:bg-pink-500 group-hover:text-white transition-colors shadow-sm">
+                                        <i className="fas fa-play ml-1"></i>
+                                    </span>
                                 </div>
                             </div>
                         ))}
@@ -287,28 +458,32 @@
                 </div>
             </div>
         );
+        /* --- PART 4: LESSON LOGIC & APP ROOT --- */
 
-        // 4. Active Lesson View
+        // 5. ACTIVE LESSON VIEW
         const LessonView = ({ lesson, onBack }) => {
             const [activeTab, setActiveTab] = useState('vocab');
             const [quizScore, setQuizScore] = useState(null);
-            // KANJI MODAL STATE
-            const [selectedKanji, setSelectedKanji] = useState(null); // { char: "日", ...data }
+            const [selectedKanji, setSelectedKanji] = useState(null);
 
             const tabs = [
-                { id: 'vocab', label: 'Vocab', icon: 'fas fa-font' },
+                { id: 'vocab', label: 'Vocab', icon: 'fas fa-language' },
                 { id: 'grammar', label: 'Grammar', icon: 'fas fa-book' },
                 { id: 'kanji', label: 'Kanji', icon: 'fas fa-torii-gate' },
                 { id: 'tricks', label: 'Tricks', icon: 'fas fa-lightbulb' },
                 { id: 'quiz', label: 'Quiz', icon: 'fas fa-question-circle' }
             ];
 
-            const lessonKanji = lesson.vocab.map(v => v.kanji).filter(k => KANJI_LIB[k]);
+            // Filter Kanji used in this lesson
+            const lessonKanji = lesson.vocab
+                .map(v => v.kanji)
+                .filter(k => KANJI_LIB[k]); // Only show if it exists in our library
 
             return (
-                <div className="h-full flex flex-col bg-slate-50 fade-in w-full relative z-20">
+                <div className="h-full flex flex-col fade-in relative z-20">
+                    <SakuraBackground />
                     
-                    {/* Render Modal if a kanji is selected */}
+                    {/* Modal for Kanji Tab */}
                     {selectedKanji && (
                         <KanjiModal 
                             kanji={selectedKanji.char} 
@@ -317,108 +492,103 @@
                         />
                     )}
 
-                    <div className="flex-none bg-white/95 backdrop-blur-md border-b border-slate-200 px-4 py-3 md:px-6 md:py-4 flex flex-col md:flex-row items-center justify-between shadow-sm z-30 gap-3">
-                        <div className="w-full md:w-auto flex justify-between items-center">
-                            <button onClick={onBack} className="text-sm font-bold text-slate-500 hover:text-pink-600 px-3 py-1 rounded-md hover:bg-pink-50 transition-colors">✕ Close</button>
+                    {/* Header */}
+                    <div className="flex-none bg-white/90 backdrop-blur-md border-b border-white px-4 py-3 flex flex-col md:flex-row items-center justify-between z-30 shadow-sm">
+                        <div className="w-full md:w-auto flex justify-between items-center mb-2 md:mb-0">
+                            <button onClick={onBack} className="text-slate-500 hover:text-pink-600 font-bold px-3 py-1 rounded-full hover:bg-slate-100 transition-colors">
+                                ✕ Close
+                            </button>
                             <span className="md:hidden font-bold text-slate-800">L{lesson.id}</span>
                         </div>
-                        <h2 className="hidden md:block font-bold text-lg text-slate-800">L{lesson.id}: {lesson.title}</h2>
-                        <div className="flex bg-slate-100/80 rounded-xl p-1 w-full md:w-auto overflow-x-auto no-scrollbar">
+                        
+                        <div className="flex bg-slate-100/80 rounded-full p-1 overflow-x-auto no-scrollbar max-w-full">
                             {tabs.map(tab => (
                                 <button
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id)}
-                                    className={`flex-1 md:flex-none px-4 md:px-6 py-2 rounded-lg text-sm font-bold transition-all whitespace-nowrap flex items-center gap-2 justify-center ${activeTab === tab.id ? 'bg-white text-pink-500 shadow-md transform scale-105' : 'text-slate-500 hover:text-slate-700 hover:bg-white/50'}`}
+                                    className={`px-5 py-2 rounded-full text-sm font-bold transition-all whitespace-nowrap flex items-center gap-2 ${activeTab === tab.id ? 'bg-white text-pink-600 shadow-md' : 'text-slate-500 hover:text-slate-700'}`}
                                 >
-                                    <i className={tab.icon}></i>
-                                    <span>{tab.label}</span>
+                                    <i className={tab.icon}></i> {tab.label}
                                 </button>
                             ))}
                         </div>
                     </div>
 
-                    <div className="flex-1 overflow-y-auto p-4 md:p-8 w-full bg-slate-50/50">
-                        <div className="max-w-3xl mx-auto pb-24 slide-up">
+                    {/* Content Area */}
+                    <div className="flex-1 overflow-y-auto p-4 md:p-8 w-full">
+                        <div className="max-w-4xl mx-auto pb-24 slide-up">
                             
-                            {/* VOCAB */}
+                            {/* VOCAB TAB */}
                             {activeTab === 'vocab' && (
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     {lesson.vocab.map((word, i) => (
-                                        <div key={i} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between hover:border-pink-200 transition-colors">
+                                        <div key={i} className="bg-white/80 p-6 rounded-3xl shadow-sm hover:shadow-md transition-all flex items-center justify-between border border-white">
                                             <div>
                                                 <p className="jp text-3xl font-bold text-slate-800 mb-1">{word.kanji}</p>
-                                                <p className="text-xs font-bold text-pink-400 uppercase tracking-wide">{word.romaji}</p>
-                                                <p className="text-xs text-slate-400">{word.kana}</p>
+                                                <p className="text-xs font-bold text-pink-500 uppercase tracking-wider">{word.romaji}</p>
                                             </div>
-                                            <p className="font-semibold text-slate-600 text-sm text-right max-w-[50%]">{word.mean}</p>
+                                            <div className="text-right">
+                                                <p className="font-bold text-slate-600">{word.mean}</p>
+                                                <p className="text-xs text-slate-400 mt-1">{word.kana}</p>
+                                            </div>
                                         </div>
                                     ))}
                                 </div>
                             )}
 
-                            {/* GRAMMAR */}
+                            {/* GRAMMAR TAB */}
                             {activeTab === 'grammar' && (
-                                <div className="space-y-8">
+                                <div className="space-y-6">
                                     {lesson.grammar.map((point, i) => (
-                                        <div key={i} className="bg-white p-8 rounded-3xl border border-slate-100 shadow-md relative overflow-hidden">
-                                            <div className="absolute top-0 left-0 w-2 h-full bg-pink-400"></div>
+                                        <div key={i} className="bg-white/90 p-8 rounded-3xl shadow-sm border border-white relative overflow-hidden">
+                                            <div className="absolute top-0 left-0 w-1 h-full bg-pink-400"></div>
                                             <h3 className="text-xl font-bold text-slate-800 mb-4">{point.title}</h3>
-                                            <div className="bg-slate-100 px-4 py-3 rounded-xl font-mono text-sm text-pink-600 mb-4 inline-block font-bold border border-slate-200 shadow-inner">
+                                            <div className="bg-slate-100 px-4 py-2 rounded-lg font-mono text-sm text-pink-600 mb-4 inline-block font-bold border border-slate-200">
                                                 {point.formula}
                                             </div>
-                                            <p className="text-slate-600 mb-6 text-base leading-relaxed">{point.explanation}</p>
-                                            <div className="bg-pink-50/50 p-5 rounded-2xl border border-pink-100">
-                                                <p className="jp text-lg font-bold text-slate-800 mb-1">{point.example.jp}</p>
-                                                <p className="text-sm text-slate-500 italic">{point.example.en}</p>
+                                            <p className="text-slate-600 mb-6 leading-relaxed">{point.explanation}</p>
+                                            <div className="bg-pink-50 p-4 rounded-xl border border-pink-100">
+                                                <p className="jp text-lg font-bold text-slate-800">{point.example.jp}</p>
+                                                <p className="text-sm text-slate-500 italic mt-1">{point.example.en}</p>
                                             </div>
                                         </div>
                                     ))}
                                 </div>
                             )}
 
-                            {/* KANJI (INTERACTIVE CARDS) */}
+                            {/* KANJI TAB (Interactive) */}
                             {activeTab === 'kanji' && (
-                                <div className="space-y-6">
-                                    <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6 flex gap-3 items-center">
-                                        <i className="fas fa-info-circle text-blue-500 text-xl"></i>
-                                        <p className="text-blue-800 text-sm">Click on any Kanji card to reveal its meaning and memory trick!</p>
-                                    </div>
-
+                                <div>
                                     {lessonKanji.length > 0 ? (
-                                        <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+                                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
                                             {lessonKanji.map((kChar, i) => {
                                                 const data = KANJI_LIB[kChar];
                                                 return (
                                                     <div 
                                                         key={i} 
                                                         onClick={() => setSelectedKanji({ char: kChar, data: data })}
-                                                        className="bg-white rounded-3xl p-8 border-2 border-slate-100 shadow-sm hover:shadow-xl hover:border-pink-300 hover:-translate-y-2 transition-all cursor-pointer flex flex-col items-center justify-center aspect-square relative group"
+                                                        className="bg-white rounded-3xl p-8 aspect-square flex flex-col items-center justify-center shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all cursor-pointer border-2 border-transparent hover:border-pink-200 group"
                                                     >
-                                                        {/* Hover Hint */}
-                                                        <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity text-pink-400">
-                                                            <i className="fas fa-expand-alt"></i>
-                                                        </div>
-
-                                                        <span className="kanji-font text-7xl text-slate-800 group-hover:text-pink-500 transition-colors mb-2">{kChar}</span>
-                                                        <span className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-2 group-hover:text-pink-400">Click to Reveal</span>
+                                                        <span className="kanji-font text-6xl text-slate-700 group-hover:text-pink-500 transition-colors mb-4">{kChar}</span>
+                                                        <span className="text-[10px] font-bold text-slate-300 uppercase tracking-widest group-hover:text-pink-400">Tap to Reveal</span>
                                                     </div>
                                                 );
                                             })}
                                         </div>
                                     ) : (
-                                        <div className="text-center py-10 text-slate-400">
-                                            <p>No new Kanji needed for this lesson!</p>
+                                        <div className="text-center py-20 bg-white/50 rounded-3xl border-2 border-dashed border-slate-200">
+                                            <p className="text-slate-400 font-bold">No new Kanji in this lesson!</p>
                                         </div>
                                     )}
                                 </div>
                             )}
 
-                            {/* TRICKS */}
+                            {/* TRICKS TAB */}
                             {activeTab === 'tricks' && (
                                 <div className="space-y-4">
                                     {lesson.tricks.map((trick, i) => (
-                                        <div key={i} className="bg-yellow-50 p-6 rounded-2xl border border-yellow-200 flex gap-4 items-start shadow-sm">
-                                            <span className="text-3xl text-yellow-500"><i className="fas fa-lightbulb"></i></span>
+                                        <div key={i} className="bg-yellow-50/80 p-6 rounded-2xl border border-yellow-200 flex gap-4 items-start shadow-sm">
+                                            <span className="text-2xl text-yellow-500 bg-white rounded-full w-10 h-10 flex items-center justify-center shadow-sm">💡</span>
                                             <div>
                                                 <h3 className="font-bold text-yellow-900 text-lg mb-1">{trick.title}</h3>
                                                 <p className="text-yellow-800 leading-relaxed">{trick.content}</p>
@@ -428,19 +598,19 @@
                                 </div>
                             )}
 
-                            {/* QUIZ */}
+                            {/* QUIZ TAB */}
                             {activeTab === 'quiz' && (
                                 <div>
                                     {quizScore === null ? (
                                         <QuizComponent questions={lesson.quiz} onFinish={setQuizScore} />
                                     ) : (
-                                        <div className="text-center py-20 bg-white rounded-3xl shadow-xl border border-slate-100 mx-auto max-w-md slide-up">
-                                            <div className="text-8xl mb-6 animate-bounce">🎉</div>
+                                        <div className="text-center py-16 bg-white rounded-3xl shadow-xl mx-auto max-w-md slide-up border border-slate-100">
+                                            <div className="text-7xl mb-6">🎉</div>
                                             <h3 className="text-3xl font-bold text-slate-800 mb-2">Lesson Complete!</h3>
-                                            <p className="text-slate-500 mb-8 text-lg">You scored <span className="text-pink-500 font-bold">{quizScore}</span> / {lesson.quiz.length}</p>
+                                            <p className="text-slate-500 mb-8 font-medium">You scored <span className="text-pink-500 font-bold text-xl">{quizScore}</span> / {lesson.quiz.length}</p>
                                             <button 
                                                 onClick={() => { setQuizScore(null); setActiveTab('vocab'); }}
-                                                className="bg-pink-500 text-white px-10 py-4 rounded-full font-bold shadow-lg shadow-pink-200 hover:bg-pink-600 hover:scale-105 transition-all"
+                                                className="bg-slate-800 text-white px-8 py-3 rounded-full font-bold hover:bg-slate-900 transition-all shadow-lg hover:shadow-xl hover:-translate-y-1"
                                             >
                                                 Review Again
                                             </button>
@@ -454,6 +624,7 @@
             );
         }
 
+        // 6. QUIZ COMPONENT
         const QuizComponent = ({ questions, onFinish }) => {
             const [answers, setAnswers] = useState({});
             
@@ -466,38 +637,40 @@
             return (
                 <div className="space-y-6">
                     {questions.map((q, qIdx) => (
-                        <div key={qIdx} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm transition-all hover:shadow-md">
+                        <div key={qIdx} className="bg-white/90 p-6 rounded-3xl shadow-sm border border-white">
                             <h4 className="font-bold text-slate-800 mb-4 text-lg flex items-center">
-                                <span className="bg-slate-100 text-slate-500 w-8 h-8 rounded-full flex items-center justify-center text-sm mr-3">{qIdx + 1}</span>
+                                <span className="bg-slate-100 text-slate-500 w-8 h-8 rounded-full flex items-center justify-center text-xs mr-3 font-bold">{qIdx + 1}</span>
                                 {q.question}
                             </h4>
                             <div className="space-y-3 pl-11">
                                 {q.options.map((opt, oIdx) => (
                                     <label key={oIdx} className={`flex items-center p-4 rounded-xl border-2 cursor-pointer transition-all ${answers[qIdx] === oIdx ? 'border-pink-500 bg-pink-50' : 'border-slate-100 hover:border-pink-200 hover:bg-slate-50'}`}>
-                                        <input type="radio" name={`q-${qIdx}`} value={oIdx} onChange={() => setAnswers({...answers, [qIdx]: oIdx})} className="w-5 h-5 text-pink-600 accent-pink-500"/>
-                                        <span className={`ml-3 font-medium ${answers[qIdx] === oIdx ? 'text-pink-900' : 'text-slate-600'}`}>{opt}</span>
+                                        <input type="radio" name={`q-${qIdx}`} value={oIdx} onChange={() => setAnswers({...answers, [qIdx]: oIdx})} className="hidden"/>
+                                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center mr-3 ${answers[qIdx] === oIdx ? 'border-pink-500' : 'border-slate-300'}`}>
+                                            {answers[qIdx] === oIdx && <div className="w-3 h-3 rounded-full bg-pink-500"></div>}
+                                        </div>
+                                        <span className={`font-bold ${answers[qIdx] === oIdx ? 'text-pink-900' : 'text-slate-600'}`}>{opt}</span>
                                     </label>
                                 ))}
                             </div>
                         </div>
                     ))}
-                    <button onClick={handleSubmit} disabled={Object.keys(answers).length < questions.length} className="w-full bg-slate-800 text-white py-5 rounded-2xl font-bold text-xl disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-900 hover:shadow-xl transition-all mt-8">Check Answers</button>
+                    <button onClick={handleSubmit} disabled={Object.keys(answers).length < questions.length} className="w-full bg-slate-800 text-white py-4 rounded-2xl font-bold text-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-900 shadow-xl transition-all mt-4">
+                        Check Answers
+                    </button>
                 </div>
             )
         }
 
+        // --- ROOT COMPONENT ---
         const App = () => {
-            const [view, setView] = useState('home');
+            const [view, setView] = useState('home'); // home, library, level, lesson
             const [currentLevel, setCurrentLevel] = useState(null);
             const [currentLesson, setCurrentLesson] = useState(null);
 
             const handleLevelSelect = (lvl) => {
-                if (lvl === "N5") {
-                    setCurrentLevel(lvl);
-                    setView('level');
-                } else {
-                    alert("N4-N1 are locked in this demo!");
-                }
+                setCurrentLevel(lvl);
+                setView('level');
             };
 
             const handleLessonSelect = (lesson) => {
@@ -507,7 +680,8 @@
 
             return (
                 <div className="h-full w-full">
-                    {view === 'home' && <LevelSelect onSelect={handleLevelSelect} />}
+                    {view === 'home' && <LevelSelect onSelect={handleLevelSelect} onOpenLibrary={() => setView('library')} />}
+                    {view === 'library' && <GrandLibrary onBack={() => setView('home')} />}
                     {view === 'level' && <LessonDashboard level={currentLevel} onBack={() => setView('home')} onSelectLesson={handleLessonSelect} />}
                     {view === 'lesson' && <LessonView lesson={currentLesson} onBack={() => setView('level')} />}
                 </div>
