@@ -104,7 +104,57 @@
         };
         /* --- PART 2: THE DATA ENGINE --- */
 
-        // 1. KANJI LIBRARY (100+ Characters)
+        // 1. HIRAGANA LIBRARY (46 Basic Characters)
+        const HIRAGANA_LIB = {
+            "あ": { romaji: "a", trick: "Looks like an Apple." },
+            "い": { romaji: "i", trick: "Two Eyes side by side." },
+            "う": { romaji: "u", trick: "Boxer punched in stomach saying 'Ugh'." },
+            "え": { romaji: "e", trick: "Energetic Ninja running." },
+            "お": { romaji: "o", trick: "A UFO flying." },
+            "か": { romaji: "ka", trick: "Blade Cutting a stick." },
+            "き": { romaji: "ki", trick: "Looks like a Key." },
+            "く": { romaji: "ku", trick: "A Cuckoo's beak." },
+            "け": { romaji: "ke", trick: "Shape of a Keg." },
+            "こ": { romaji: "ko", trick: "Two Koi fish swimming." },
+            "さ": { romaji: "sa", trick: "A Sad face (one line missing compared to Ki)." },
+            "し": { romaji: "shi", trick: "A Fishing hook." },
+            "す": { romaji: "su", trick: "Straw in a glass." },
+            "せ": { romaji: "se", trick: "Mouth facing sideways to Say something." },
+            "そ": { romaji: "so", trick: "Zigzag Sewing stitch." },
+            "た": { romaji: "ta", trick: "Looks like the letter 'ta' (t)." },
+            "ち": { romaji: "chi", trick: "Cheerleader angry at Sa." },
+            "つ": { romaji: "tsu", trick: "Tsunami wave." },
+            "て": { romaji: "te", trick: "Looks like a Dog's tail." },
+            "と": { romaji: "to", trick: "A Tornado." },
+            "な": { romaji: "na", trick: "A complicated Nut." },
+            "に": { romaji: "ni", trick: "Looks like a Knee." },
+            "ぬ": { romaji: "nu", trick: "Chopsticks holding Noodles." },
+            "ね": { romaji: "ne", trick: "Snail hiding behind a Net." },
+            "の": { romaji: "no", trick: "A No sign." },
+            "は": { romaji: "ha", trick: "H and a (Ha)." },
+            "ひ": { romaji: "hi", trick: "A smiling mouth (He he he)." },
+            "ふ": { romaji: "fu", trick: "Mount Fuji." },
+            "へ": { romaji: "he", trick: "Pointing up to Heaven." },
+            "ほ": { romaji: "ho", trick: "Horse face." },
+            "ま": { romaji: "ma", trick: "Man in a Mask." },
+            "み": { romaji: "mi", trick: "Musical note 21." },
+            "む": { romaji: "mu", trick: "Moo (Cow)." },
+            "め": { romaji: "me", trick: "Mess (Noodles dropped)." },
+            "も": { romaji: "mo", trick: "Monitor lizard with tail." },
+            "や": { romaji: "ya", trick: "A Yak." },
+            "ゆ": { romaji: "yu", trick: "A unique Unicorn." },
+            "よ": { romaji: "yo", trick: "A Yoyo dangling." },
+            "ら": { romaji: "ra", trick: "Rabbit sitting." },
+            "り": { romaji: "ri", trick: "River flowing." },
+            "る": { romaji: "ru", trick: "Hand holding a Ruby." },
+            "れ": { romaji: "re", trick: "Reindeer looking up." },
+            "ろ": { romaji: "ro", trick: "Robbed (Ruby is gone)." },
+            "わ": { romaji: "wa", trick: "White Swan." },
+            "を": { romaji: "wo", trick: "Crack in a Wall." },
+            "ん": { romaji: "n", trick: "Italicized n." }
+        };
+
+        // 2. KANJI LIBRARY (100+ Characters)
         const KANJI_LIB = {
             // Numbers
             "一": { mean: "One", onyomi: "ICHI", kunyomi: "hito", trick: "One finger holding up the number one." },
@@ -226,8 +276,8 @@
             "駅": { mean: "Station", onyomi: "EKI", kunyomi: "—", trick: "Horse + Stalk. Horse stop." },
             "社": { mean: "Company", onyomi: "SHA", kunyomi: "yashiro", trick: "God + Earth. Shrine/Society." }
         };
-        // 2. LESSON DATABASE
-                // --- COMPLETE 25-LESSON DATABASE ---
+
+        // 3. LESSON DATABASE
         const DATABASE = {
             levels: ["N5", "N4", "N3", "N2", "N1"],
             lessons: {
@@ -263,7 +313,34 @@
 
         /* --- PART 3: UI COMPONENTS --- */
 
-        // 1. KANJI MODAL (The Popup)
+        // NEW COMPONENT: Hiragana Modal
+        const HiraganaModal = ({ char, data, onClose }) => {
+            if (!char) return null;
+            return (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 fade-in" onClick={onClose}>
+                    <div className="glass-card rounded-3xl p-8 w-full max-w-sm relative pop-in overflow-hidden" onClick={e => e.stopPropagation()}>
+                        <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-emerald-400 to-teal-400"></div>
+                        <button onClick={onClose} className="absolute top-5 right-5 text-slate-300 hover:text-emerald-500 text-3xl transition-colors">&times;</button>
+                        
+                        <div className="text-center mt-4">
+                            <span className="jp text-9xl text-slate-800 leading-none drop-shadow-md">{char}</span>
+                            <h2 className="text-4xl font-bold text-emerald-500 mt-4 uppercase tracking-wider">{data.romaji}</h2>
+                        </div>
+
+                        <div className="mt-8 bg-yellow-50/90 p-6 rounded-2xl border-l-4 border-yellow-400 shadow-sm">
+                            <h3 className="text-yellow-800 font-bold flex items-center gap-2 mb-2 text-sm uppercase tracking-wide">
+                                <i className="fas fa-lightbulb"></i> Memory Trick
+                            </h3>
+                            <p className="text-slate-700 font-medium text-lg leading-relaxed">
+                                {data.trick}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // 1. KANJI MODAL (Existing)
         const KanjiModal = ({ kanji, data, onClose }) => {
             if (!kanji) return null;
             return (
@@ -300,37 +377,75 @@
                 </div>
             );
         };
-
-        // 2. GRAND LIBRARY (Browse 100+ Kanji)
-        const GrandLibrary = ({ onBack }) => {
+        // 2. GRAND LIBRARY (Browse Kanji OR Hiragana)
+        const GrandLibrary = ({ initialMode = 'kanji', onBack }) => {
+            const [mode, setMode] = useState(initialMode); // 'kanji' or 'hiragana'
             const [search, setSearch] = useState("");
-            const [selectedKanji, setSelectedKanji] = useState(null);
+            const [selectedItem, setSelectedItem] = useState(null);
+
+            // Toggle Data Source
+            const activeLib = mode === 'kanji' ? KANJI_LIB : HIRAGANA_LIB;
 
             // Convert Object to Array and Filter
-            const filteredKanji = Object.entries(KANJI_LIB).filter(([char, data]) => {
-                const term = search.toLowerCase();
-                return char.includes(term) || 
-                       data.mean.toLowerCase().includes(term) || 
-                       data.trick.toLowerCase().includes(term);
-            });
+            const filteredItems = useMemo(() => {
+                return Object.entries(activeLib).filter(([char, data]) => {
+                    const term = search.toLowerCase();
+                    // Search logic depends on mode
+                    if (mode === 'kanji') {
+                        return char.includes(term) || 
+                               data.mean.toLowerCase().includes(term) || 
+                               data.trick.toLowerCase().includes(term);
+                    } else {
+                        return char.includes(term) || 
+                               data.romaji.toLowerCase().includes(term) || 
+                               data.trick.toLowerCase().includes(term);
+                    }
+                });
+            }, [search, mode, activeLib]);
 
             return (
                 <div className="h-full flex flex-col fade-in relative z-20">
                     <SakuraBackground />
-                    {selectedKanji && <KanjiModal kanji={selectedKanji.char} data={selectedKanji.data} onClose={() => setSelectedKanji(null)} />}
+                    
+                    {/* Modals */}
+                    {selectedItem && mode === 'kanji' && (
+                        <KanjiModal kanji={selectedItem.char} data={selectedItem.data} onClose={() => setSelectedItem(null)} />
+                    )}
+                    {selectedItem && mode === 'hiragana' && (
+                        <HiraganaModal char={selectedItem.char} data={selectedItem.data} onClose={() => setSelectedItem(null)} />
+                    )}
 
+                    {/* Header Bar */}
                     <div className="flex-none p-6 glass-panel flex flex-col md:flex-row items-center justify-between gap-4 z-30">
                         <div className="flex items-center gap-4 w-full md:w-auto">
                             <button onClick={onBack} className="text-slate-500 hover:text-pink-600 transition-colors">
                                 <i className="fas fa-arrow-left text-xl"></i>
                             </button>
-                            <h2 className="text-2xl font-bold text-slate-800">Grand Kanji Library</h2>
+                            <h2 className="text-2xl font-bold text-slate-800">Grand Library</h2>
                         </div>
-                        <div className="relative w-full md:w-96">
+
+                        {/* Mode Toggle Switch */}
+                        <div className="bg-slate-200/50 p-1 rounded-full flex relative">
+                            <button 
+                                onClick={() => { setMode('hiragana'); setSearch(""); }}
+                                className={`px-6 py-2 rounded-full text-sm font-bold transition-all z-10 ${mode === 'hiragana' ? 'bg-white text-emerald-600 shadow-md' : 'text-slate-500 hover:text-slate-700'}`}
+                            >
+                                Hiragana
+                            </button>
+                            <button 
+                                onClick={() => { setMode('kanji'); setSearch(""); }}
+                                className={`px-6 py-2 rounded-full text-sm font-bold transition-all z-10 ${mode === 'kanji' ? 'bg-white text-pink-600 shadow-md' : 'text-slate-500 hover:text-slate-700'}`}
+                            >
+                                Kanji
+                            </button>
+                        </div>
+
+                        {/* Search Bar */}
+                        <div className="relative w-full md:w-80">
                             <i className="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
                             <input 
                                 type="text" 
-                                placeholder="Search 'Sun', 'Tree', 'Fire'..." 
+                                placeholder={mode === 'kanji' ? "Search 'Sun', 'Fire'..." : "Search 'a', 'ka', 'shi'..."}
                                 className="w-full pl-12 pr-4 py-3 rounded-full border-none shadow-inner bg-slate-100 focus:bg-white focus:ring-2 focus:ring-pink-300 transition-all outline-none"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
@@ -338,24 +453,35 @@
                         </div>
                     </div>
 
+                    {/* Content Grid */}
                     <div className="flex-1 overflow-y-auto p-6 md:p-10 scroll-smooth">
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 pb-20 max-w-7xl mx-auto">
-                            {filteredKanji.map(([char, data]) => (
+                            {filteredItems.map(([char, data]) => (
                                 <div 
                                     key={char}
-                                    onClick={() => setSelectedKanji({ char, data })}
-                                    className="bg-white rounded-3xl p-6 aspect-square flex flex-col items-center justify-center shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all cursor-pointer border border-slate-100 group relative overflow-hidden"
+                                    onClick={() => setSelectedItem({ char, data })}
+                                    className={`bg-white rounded-3xl p-6 aspect-square flex flex-col items-center justify-center shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all cursor-pointer border border-slate-100 group relative overflow-hidden ${mode === 'hiragana' ? 'hover:border-emerald-200' : 'hover:border-pink-200'}`}
                                 >
-                                    <div className="absolute inset-0 bg-gradient-to-br from-pink-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                                    <span className="kanji-font text-5xl text-slate-700 group-hover:text-pink-500 transition-colors relative z-10">{char}</span>
-                                    <span className="text-xs font-bold text-slate-400 mt-3 text-center line-clamp-1 relative z-10 group-hover:text-pink-400">{data.mean}</span>
+                                    <div className={`absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity ${mode === 'hiragana' ? 'from-emerald-50 to-transparent' : 'from-pink-50 to-transparent'}`}></div>
+                                    
+                                    {mode === 'kanji' ? (
+                                        <>
+                                            <span className="kanji-font text-5xl text-slate-700 group-hover:text-pink-500 transition-colors relative z-10">{char}</span>
+                                            <span className="text-xs font-bold text-slate-400 mt-3 text-center line-clamp-1 relative z-10 group-hover:text-pink-400">{data.mean}</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <span className="jp text-6xl text-slate-700 group-hover:text-emerald-500 transition-colors relative z-10">{char}</span>
+                                            <span className="text-lg font-bold text-slate-300 mt-1 uppercase tracking-wider relative z-10 group-hover:text-emerald-400">{data.romaji}</span>
+                                        </>
+                                    )}
                                 </div>
                             ))}
                         </div>
-                        {filteredKanji.length === 0 && (
+                        {filteredItems.length === 0 && (
                             <div className="text-center py-20 text-slate-400">
                                 <i className="fas fa-ghost text-4xl mb-4"></i>
-                                <p>No Kanji found matching "{search}"</p>
+                                <p>No characters found matching "{search}"</p>
                             </div>
                         )}
                     </div>
@@ -385,7 +511,7 @@
                             </h3>
                             <div className="space-y-4 text-slate-600 leading-relaxed text-lg font-medium">
                                 <p>I built <span className="text-pink-600 font-bold">Nihongo Pro</span> to make Japanese feel peaceful, logical, and human.</p>
-                                <p>Below, choose your path or explore the new <span className="font-bold text-slate-800">Grand Library</span> to see all 100+ N5 Kanji at once.</p>
+                                <p>New Update: I've added a dedicated <span className="text-emerald-600 font-bold">Hiragana Section</span> with memory tricks for every single character.</p>
                             </div>
                         </div>
                     </div>
@@ -408,15 +534,28 @@
                             </div>
                         </div>
 
-                        {/* Library Button */}
-                        <button onClick={onOpenLibrary} className="bg-gradient-to-br from-pink-500 to-purple-600 p-6 rounded-3xl text-white shadow-lg shadow-pink-200 hover:shadow-xl hover:scale-[1.02] transition-all text-left group relative overflow-hidden">
-                            <div className="absolute right-0 bottom-0 opacity-20 text-9xl -mr-6 -mb-6 rotate-12"><i className="fas fa-book"></i></div>
-                            <h3 className="text-2xl font-bold mb-1">Grand Library</h3>
-                            <p className="text-pink-100 font-medium">Browse 100+ Kanji & Tricks</p>
-                            <div className="mt-6 inline-flex items-center gap-2 bg-white/20 px-4 py-2 rounded-full text-sm font-bold backdrop-blur-sm group-hover:bg-white/30 transition-colors">
-                                Open Database <i className="fas fa-arrow-right"></i>
-                            </div>
-                        </button>
+                        {/* Library Buttons Container */}
+                        <div className="grid grid-cols-2 gap-4">
+                            {/* Hiragana Button */}
+                            <button onClick={() => onOpenLibrary('hiragana')} className="bg-gradient-to-br from-emerald-400 to-teal-500 p-6 rounded-3xl text-white shadow-lg shadow-emerald-100 hover:shadow-xl hover:scale-[1.02] transition-all text-left relative overflow-hidden group">
+                                <div className="absolute right-0 bottom-0 opacity-20 text-7xl -mr-4 -mb-4 font-black">あ</div>
+                                <h3 className="text-xl font-bold mb-1">Hiragana</h3>
+                                <p className="text-emerald-100 text-sm font-medium">The Basics</p>
+                                <div className="mt-4 inline-flex items-center justify-center w-8 h-8 bg-white/20 rounded-full backdrop-blur-sm group-hover:bg-white/30 transition-colors">
+                                    <i className="fas fa-arrow-right text-xs"></i>
+                                </div>
+                            </button>
+
+                            {/* Kanji Button */}
+                            <button onClick={() => onOpenLibrary('kanji')} className="bg-gradient-to-br from-pink-500 to-purple-600 p-6 rounded-3xl text-white shadow-lg shadow-pink-200 hover:shadow-xl hover:scale-[1.02] transition-all text-left relative overflow-hidden group">
+                                <div className="absolute right-0 bottom-0 opacity-20 text-7xl -mr-4 -mb-4"><i className="fas fa-book"></i></div>
+                                <h3 className="text-xl font-bold mb-1">Kanji</h3>
+                                <p className="text-pink-100 text-sm font-medium">Grand Library</p>
+                                <div className="mt-4 inline-flex items-center justify-center w-8 h-8 bg-white/20 rounded-full backdrop-blur-sm group-hover:bg-white/30 transition-colors">
+                                    <i className="fas fa-arrow-right text-xs"></i>
+                                </div>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -458,7 +597,6 @@
                 </div>
             </div>
         );
-        /* --- PART 4: LESSON LOGIC & APP ROOT --- */
 
         // 5. ACTIVE LESSON VIEW
         const LessonView = ({ lesson, onBack }) => {
@@ -477,13 +615,12 @@
             // Filter Kanji used in this lesson
             const lessonKanji = lesson.vocab
                 .map(v => v.kanji)
-                .filter(k => KANJI_LIB[k]); // Only show if it exists in our library
+                .filter(k => KANJI_LIB[k]); 
 
             return (
                 <div className="h-full flex flex-col fade-in relative z-20">
                     <SakuraBackground />
                     
-                    {/* Modal for Kanji Tab */}
                     {selectedKanji && (
                         <KanjiModal 
                             kanji={selectedKanji.char} 
@@ -556,7 +693,7 @@
                                 </div>
                             )}
 
-                            {/* KANJI TAB (Interactive) */}
+                            {/* KANJI TAB */}
                             {activeTab === 'kanji' && (
                                 <div>
                                     {lessonKanji.length > 0 ? (
@@ -667,6 +804,7 @@
             const [view, setView] = useState('home'); // home, library, level, lesson
             const [currentLevel, setCurrentLevel] = useState(null);
             const [currentLesson, setCurrentLesson] = useState(null);
+            const [libraryMode, setLibraryMode] = useState('kanji');
 
             const handleLevelSelect = (lvl) => {
                 setCurrentLevel(lvl);
@@ -678,10 +816,15 @@
                 setView('lesson');
             };
 
+            const handleOpenLibrary = (mode) => {
+                setLibraryMode(mode);
+                setView('library');
+            };
+
             return (
                 <div className="h-full w-full">
-                    {view === 'home' && <LevelSelect onSelect={handleLevelSelect} onOpenLibrary={() => setView('library')} />}
-                    {view === 'library' && <GrandLibrary onBack={() => setView('home')} />}
+                    {view === 'home' && <LevelSelect onSelect={handleLevelSelect} onOpenLibrary={handleOpenLibrary} />}
+                    {view === 'library' && <GrandLibrary initialMode={libraryMode} onBack={() => setView('home')} />}
                     {view === 'level' && <LessonDashboard level={currentLevel} onBack={() => setView('home')} onSelectLesson={handleLessonSelect} />}
                     {view === 'lesson' && <LessonView lesson={currentLesson} onBack={() => setView('level')} />}
                 </div>
